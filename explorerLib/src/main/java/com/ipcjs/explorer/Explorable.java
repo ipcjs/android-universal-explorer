@@ -8,7 +8,11 @@ import java.util.List;
  * Created by ipcjs on 2015/11/30.
  */
 public interface Explorable {
-    void doAction(Context context);
+    /**
+     * @param context
+     * @param extra   hack, 不推荐使用~~
+     */
+    void onAction(Context context, Object extra);
 
     Explorable getParent();
 

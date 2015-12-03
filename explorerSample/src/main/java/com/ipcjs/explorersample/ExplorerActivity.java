@@ -1,6 +1,8 @@
 package com.ipcjs.explorersample;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -22,6 +24,7 @@ public class ExplorerActivity extends AppCompatActivity {
             Test.class,
             MainActivity.class,
             ExplorerActivity.class,
+            AppFragment.class,
     };
 
     enum Action implements Explorable.OnActionListener {
@@ -70,4 +73,13 @@ public class ExplorerActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item) || mEnumMenuHelper.onOptionsItemSelected(item);
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    @Override
+    public void onBackPressed() {
+        // 先移除App包下的Fragment~~
+        if (!getFragmentManager().popBackStackImmediate()) {
+            // App包下的Fragment全部pop了.
+        }
+        super.onBackPressed();
+    }
 }

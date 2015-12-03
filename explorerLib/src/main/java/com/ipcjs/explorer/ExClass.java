@@ -47,18 +47,11 @@ public class ExClass implements Explorable {
         this(cls.getName());
     }
 
-    private int getContainerId(Activity activity) {
-        if (activity instanceof FragmentActivity) {
-            List<android.support.v4.app.Fragment> fragmentList = ((FragmentActivity) activity).getSupportFragmentManager().getFragments();
-            for (android.support.v4.app.Fragment fragment : fragmentList) {
-                // 取ExplorerFragment的容器id, 作为新的fragment的容器id
-                if (fragment instanceof ExplorerFragment
-                        && fragment.getView() != null
-                        && fragment.getView().getParent() instanceof ViewGroup
-                        && ((ViewGroup) fragment.getView().getParent()).getId() != View.NO_ID
-                        ) {
-                    return ((ViewGroup) fragment.getView().getParent()).getId();
-                }
+    private int getContainerId(Object fragment) {
+        if (fragment instanceof ExplorerFragment) {
+            View view = ((ExplorerFragment) fragment).getView();
+            if (view != null && view.getParent() instanceof ViewGroup && ((ViewGroup) view.getParent()).getId() != View.NO_ID) {
+                return ((ViewGroup) view.getParent()).getId();
             }
         }
         return android.R.id.content;
@@ -66,12 +59,12 @@ public class ExClass implements Explorable {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
-    public void doAction(Context context) {
+    public void onAction(Context context, Object extra) {
         try {
             Class<?> cls = Class.forName(mPackage);
             if (Activity.class.isAssignableFrom(cls)) {
                 Intent intent = new Intent(context, cls);
-                if (context instanceof Activity) {
+                if (!(context instanceof Activity)) {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 }
                 context.startActivity(intent);
@@ -79,7 +72,14 @@ public class ExClass implements Explorable {
                 if (context instanceof Activity) {
                     ((Activity) context).setTitle(cls.getSimpleName());
                     ((Activity) context).getFragmentManager().beginTransaction()
-                            .replace(getContainerId((Activity) context), Fragment.instantiate(context, cls.getName(), null), cls.getName())
+                            .replace(getContainerId(extra), Fragment.instantiate(context, cls.getName(), null), cls.getName())
+                            .addToBackStack(null)
+                            .commit();
+                }
+                // 试图移除ExplorerFragment
+                if (extra instanceof ExplorerFragment && context instanceof FragmentActivity) {
+                    ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
+                            .remove((android.support.v4.app.Fragment) extra)
                             .addToBackStack(null)
                             .commit();
                 }
@@ -87,7 +87,7 @@ public class ExClass implements Explorable {
                 if (context instanceof FragmentActivity) {
                     ((FragmentActivity) context).setTitle(cls.getSimpleName());
                     ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
-                            .replace(getContainerId((Activity) context), android.support.v4.app.Fragment.instantiate(context, cls.getName(), null), cls.getName())
+                            .replace(getContainerId(extra), android.support.v4.app.Fragment.instantiate(context, cls.getName(), null), cls.getName())
                             .addToBackStack(null)
                             .commit();
                 }
@@ -95,6 +95,7 @@ public class ExClass implements Explorable {
                 // public static void main(String... args);
                 Method mainMethod = cls.getMethod("main", new String[]{}.getClass());
                 mainMethod.invoke(null, new Object[]{new String[]{}});// 这样才能和args对应...
+                ExUtils.error("执行main(), " + cls.getSimpleName());
             }
         } catch (Exception e) {
             ExUtils.error(e, e.getMessage());

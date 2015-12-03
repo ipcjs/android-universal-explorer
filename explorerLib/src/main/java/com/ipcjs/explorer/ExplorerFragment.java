@@ -155,7 +155,7 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
             children.add(0, ex.getParent());
             mAdapter.setExList(children);
         } else {
-            ex.doAction(getContext());
+            ex.onAction(getContext(), this);
         }
     }
 

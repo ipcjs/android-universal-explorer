@@ -28,7 +28,7 @@ public class ExFile implements Explorable {
     }
 
     @Override
-    public void doAction(final Context context) {
+    public void onAction(final Context context, Object extra) {
         boolean isInternalFile = getPath().startsWith(context.getFilesDir().getParentFile().getAbsolutePath());
         if (isInternalFile) {
             File dir = new File(ExUtils.getDir(context, true, true), "file_explorer");
