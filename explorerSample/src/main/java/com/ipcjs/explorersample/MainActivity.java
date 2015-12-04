@@ -5,11 +5,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-import com.ipcjs.explorer.ExClass;
 import com.ipcjs.explorer.ExplorerFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,9 +29,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         if (savedInstanceState == null) {
-            ExClass.addAllClass(MainActivity.class, ExplorerActivity.class);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.content, new ExplorerFragment(), "explorer")
+                    .add(R.id.content, ExplorerFragment.newInstance(MainActivity.class, ExplorerActivity.class), "explorer")
                     .commit();
         }
     }

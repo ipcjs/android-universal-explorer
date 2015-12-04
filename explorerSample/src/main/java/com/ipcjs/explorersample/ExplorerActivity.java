@@ -11,8 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ipcjs.explorer.EnumMenuHelper;
-import com.ipcjs.explorer.ExClass;
-import com.ipcjs.explorer.Explorable;
+import com.ipcjs.explorer.Explorer;
 import com.ipcjs.explorer.ExplorerFragment;
 
 /**
@@ -27,23 +26,19 @@ public class ExplorerActivity extends AppCompatActivity {
             AppFragment.class,
     };
 
-    enum Action implements Explorable.OnActionListener {
+    enum Action implements Explorer.OnActionListener {
         action() {
             @Override
-            public void onAction(Context context, Object extra) {
+            public void onAction(Context context, Explorer.ExplorerContainer container) {
                 Toast.makeText(context, "action", Toast.LENGTH_SHORT).show();
             }
         },
         /**/;
 
         @Override
-        public void onAction(Context context, Object extra) {
+        public void onAction(Context context, Explorer.ExplorerContainer container) {
 
         }
-    }
-
-    static {
-        ExClass.addAllClass(sClassArray);// 设置要浏览的class的内容
     }
 
     private EnumMenuHelper<Action> mEnumMenuHelper;
@@ -57,7 +52,7 @@ public class ExplorerActivity extends AppCompatActivity {
         mEnumMenuHelper = new EnumMenuHelper<>(Action.class, this, null);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(android.R.id.content, new ExplorerFragment(), ExplorerFragment.class.getName())
+                    .replace(android.R.id.content, ExplorerFragment.newInstance(sClassArray), ExplorerFragment.class.getName())
                     .commit();
         }
     }

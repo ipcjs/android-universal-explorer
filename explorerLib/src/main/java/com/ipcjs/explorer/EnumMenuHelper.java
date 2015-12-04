@@ -7,20 +7,20 @@ import android.view.MenuItem;
 /**
  * Created by JiangSong on 2015/12/3.
  */
-public class EnumMenuHelper<ACTION extends Enum & Explorable.OnActionListener> {
+public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener> {
     private Class<ACTION> mEnumType;
     private Context mContext;
-    private Object mExtra;
+    private Explorer.ExplorerContainer mContainer;
 
     /**
      * @param enumType
-     * @param context  传递给: {@link ACTION#onAction(Context, Object)}
-     * @param extra    传递给: {@link ACTION#onAction(Context, Object)}, hack
+     * @param context   传递给: {@link ACTION#onAction(Context, Explorer.ExplorerContainer)}
+     * @param container 传递给: {@link ACTION#onAction(Context, Explorer.ExplorerContainer)}
      */
-    public EnumMenuHelper(Class<ACTION> enumType, Context context, Object extra) {
+    public EnumMenuHelper(Class<ACTION> enumType, Context context, Explorer.ExplorerContainer container) {
         mEnumType = enumType;
         mContext = context;
-        mExtra = extra;
+        mContainer = container;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -36,7 +36,7 @@ public class EnumMenuHelper<ACTION extends Enum & Explorable.OnActionListener> {
         if (mEnumType.getName().equals(item.getTitleCondensed().toString())) {
             /*这里的类型貌似写ACTION会报错~, 故先写Enum, 再强转~~*/
             Enum action = Enum.valueOf(mEnumType, item.getTitle().toString());
-            ((ACTION) action).onAction(mContext, mExtra);
+            ((ACTION) action).onAction(mContext, mContainer);
             return true;
         } else {
             return false;

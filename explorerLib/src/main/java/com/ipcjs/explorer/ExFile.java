@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Created by JiangSong on 2015/12/2.
  */
-public class ExFile implements Explorable {
+public class ExFile implements Explorer.Explorable {
     private java.io.File mFile;
     private AsyncTask<File, Void, String> mCopyTask;
 
@@ -28,7 +28,7 @@ public class ExFile implements Explorable {
     }
 
     @Override
-    public void onAction(final Context context, Object extra) {
+    public void onAction(final Context context, Explorer.ExplorerContainer container) {
         boolean isInternalFile = getPath().startsWith(context.getFilesDir().getParentFile().getAbsolutePath());
         if (isInternalFile) {
             File dir = new File(ExUtils.getDir(context, true, true), "file_explorer");
@@ -113,7 +113,7 @@ public class ExFile implements Explorable {
     }
 
     @Override
-    public Explorable getParent() {
+    public Explorer.Explorable getParent() {
         File parentFile = mFile.getParentFile();
         if (parentFile == null) {
             return null;
@@ -127,12 +127,12 @@ public class ExFile implements Explorable {
     }
 
     @Override
-    public List<Explorable> getChildren() {
+    public List<Explorer.Explorable> getChildren(Explorer.ExplorerContainer container) {
         final java.io.File[] files = mFile.listFiles();
         if (files == null) {
             return null;
         }
-        List<Explorable> list = new ArrayList<>();
+        List<Explorer.Explorable> list = new ArrayList<>();
         for (java.io.File file : files) {
             list.add(file == null ? null : new ExFile(file));
         }

@@ -19,21 +19,55 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by JiangSong on 2015/12/2.
  */
-public class ExplorerFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class ExplorerFragment extends Fragment implements AdapterView.OnItemClickListener, Explorer.ExplorerContainer {
+    public static final String ARG_ALL_CLASS = "all_class";
     private static Context sApplication;
 
     public static Context getApplication() {
         return sApplication;
     }
 
+    public static ExplorerFragment newInstance(Class... clss) {
+        String[] names = new String[clss.length];
+        for (int i = 0; i < clss.length; i++) {
+            names[i] = clss[i].getName();
+        }
+        return newInstance(names);
+    }
+
+    public static ExplorerFragment newInstance(String... names) {
+        ExplorerFragment fragment = new ExplorerFragment();
+        Bundle args = new Bundle();
+        args.putStringArrayList(ARG_ALL_CLASS, new ArrayList<String>(Arrays.asList(names)));
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    private List<String> mAllClass;
+
     public static final String PREF_KEY_CUR_PATH = "PREF_KEY_CUR_PATH";
 
-    private enum DirAction implements Explorable.OnActionListener {
+    @Override
+    public int getContainId() {
+        View view = getView();
+        if (view != null && view.getParent() instanceof ViewGroup && ((ViewGroup) view.getParent()).getId() != View.NO_ID) {
+            return ((ViewGroup) view.getParent()).getId();
+        }
+        return android.R.id.content;
+    }
+
+    @Override
+    public List<String> getExploreRange() {
+        return mAllClass;
+    }
+
+    private enum DirAction implements Explorer.OnActionListener {
         app_dir() {
             @Override
             public String getPath(Context context) {
@@ -65,23 +99,23 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
         },
         click() {
             @Override
-            public void onAction(Context context, Object extra) {
+            public void onAction(Context context, Explorer.ExplorerContainer container) {
                 ExUtils.error("click");
             }
         },
             /*end*/;
-        Explorable ex;
+        Explorer.Explorable ex;
 
         @Override
-        public void onAction(Context context, Object extra) {
+        public void onAction(Context context, Explorer.ExplorerContainer container) {
             if (ex == null) {
                 String path = getPath(context);
                 if (path != null) {
                     ex = ExUtils.newExplorable(path);
                 }
             }
-            if (ex != null) {
-                ((ExplorerFragment) extra).openExplorable(ex);
+            if (ex != null && container != null) {
+                container.openExplorable(ex);
             }
         }
 
@@ -101,6 +135,9 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
         mEnumMenuHelper = new EnumMenuHelper<>(DirAction.class, getContext(), this);
         sApplication = getContext().getApplicationContext();
         ExUtils.forceShowOverflowMenu(getContext());
+        if (getArguments() != null) {
+            mAllClass = getArguments().getStringArrayList(ARG_ALL_CLASS);
+        }
     }
 
     @Override
@@ -139,13 +176,14 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
         openExplorable(ExUtils.newExplorable(curPath));
     }
 
-    private void openExplorable(Explorable ex) {
+    @Override
+    public void openExplorable(Explorer.Explorable ex) {
         if (ex == null) {
             ExUtils.error("无访问权限的item");
             return;
         }
         if (ex.isDir()) {
-            List<Explorable> children = ex.getChildren();
+            List<Explorer.Explorable> children = ex.getChildren(this);
             if (children == null) {
                 ExUtils.error(String.format("没有访问%s的权限", ex.getPath()));
                 return;
@@ -165,9 +203,9 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     private static class ExplorerAdapter extends BaseAdapter {
-        private List<Explorable> mExList = new ArrayList<>();
+        private List<Explorer.Explorable> mExList = new ArrayList<>();
 
-        public void setExList(List<Explorable> list) {
+        public void setExList(List<Explorer.Explorable> list) {
             if (list == null) {
                 ExUtils.error("list not can null");
                 return;
@@ -188,7 +226,7 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
         }
 
         @Override
-        public Explorable getItem(int position) {
+        public Explorer.Explorable getItem(int position) {
             return mExList.get(position);
         }
 
@@ -207,7 +245,7 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
         }
 
         public void onBindViewHolder(ExplorerViewHolder holder, int position) {
-            Explorable item = getItem(position);
+            Explorer.Explorable item = getItem(position);
             String name;
             if (item != null) {
                 name = position == 0 ? ".." : item.getName();

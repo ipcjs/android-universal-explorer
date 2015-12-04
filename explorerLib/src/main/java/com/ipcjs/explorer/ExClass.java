@@ -7,37 +7,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.FragmentActivity;
-import android.view.View;
-import android.view.ViewGroup;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 /**
  * Created by JiangSong on 2015/12/2.
  */
-public class ExClass implements Explorable {
+public class ExClass implements Explorer.Explorable {
     private static final Pattern sSplitPattern = Pattern.compile("\\.");
     public static final char DOT = '.';
-    private static List<String> sAllClass = new ArrayList<>();
     private String mPackage;
-
-    public static void clearAll() {
-        sAllClass.clear();
-    }
-
-    public static void addAllName(String... strs) {
-        sAllClass.addAll(Arrays.asList(strs));
-    }
-
-    public static void addAllClass(Class... clss) {
-        for (Class cls : clss) {
-            sAllClass.add(cls.getName());
-        }
-    }
 
     public ExClass(String pkg) {
         mPackage = pkg;
@@ -47,19 +29,16 @@ public class ExClass implements Explorable {
         this(cls.getName());
     }
 
-    private int getContainerId(Object fragment) {
-        if (fragment instanceof ExplorerFragment) {
-            View view = ((ExplorerFragment) fragment).getView();
-            if (view != null && view.getParent() instanceof ViewGroup && ((ViewGroup) view.getParent()).getId() != View.NO_ID) {
-                return ((ViewGroup) view.getParent()).getId();
-            }
+    private int getContainerId(Explorer.ExplorerContainer fragment) {
+        if (fragment != null) {
+            return fragment.getContainId();
         }
         return android.R.id.content;
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
-    public void onAction(Context context, Object extra) {
+    public void onAction(Context context, Explorer.ExplorerContainer container) {
         try {
             Class<?> cls = Class.forName(mPackage);
             if (Activity.class.isAssignableFrom(cls)) {
@@ -72,14 +51,14 @@ public class ExClass implements Explorable {
                 if (context instanceof Activity) {
                     ((Activity) context).setTitle(cls.getSimpleName());
                     ((Activity) context).getFragmentManager().beginTransaction()
-                            .replace(getContainerId(extra), Fragment.instantiate(context, cls.getName(), null), cls.getName())
+                            .replace(getContainerId(container), Fragment.instantiate(context, cls.getName(), null), cls.getName())
                             .addToBackStack(null)
                             .commit();
                 }
                 // 试图移除ExplorerFragment
-                if (extra instanceof ExplorerFragment && context instanceof FragmentActivity) {
+                if (container instanceof ExplorerFragment && context instanceof FragmentActivity) {
                     ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
-                            .remove((android.support.v4.app.Fragment) extra)
+                            .remove((android.support.v4.app.Fragment) container)
                             .addToBackStack(null)
                             .commit();
                 }
@@ -87,7 +66,7 @@ public class ExClass implements Explorable {
                 if (context instanceof FragmentActivity) {
                     ((FragmentActivity) context).setTitle(cls.getSimpleName());
                     ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
-                            .replace(getContainerId(extra), android.support.v4.app.Fragment.instantiate(context, cls.getName(), null), cls.getName())
+                            .replace(getContainerId(container), android.support.v4.app.Fragment.instantiate(context, cls.getName(), null), cls.getName())
                             .addToBackStack(null)
                             .commit();
                 }
@@ -103,7 +82,7 @@ public class ExClass implements Explorable {
     }
 
     @Override
-    public Explorable getParent() {
+    public Explorer.Explorable getParent() {
         if (mPackage.isEmpty()) {
             return null;
         }
@@ -121,9 +100,12 @@ public class ExClass implements Explorable {
     }
 
     @Override
-    public List<Explorable> getChildren() {
-        final ArrayList<Explorable> list = new ArrayList<>();
-        for (String name : sAllClass) {
+    public List<Explorer.Explorable> getChildren(Explorer.ExplorerContainer container) {
+        if (container == null) {
+            return null;
+        }
+        final ArrayList<Explorer.Explorable> list = new ArrayList<>();
+        for (String name : container.getExploreRange()) {
             if (name.startsWith(mPackage)) {
                 int nextDotIndex = name.indexOf(DOT, mPackage.length());
                 String pkg;

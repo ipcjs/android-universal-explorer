@@ -23,7 +23,7 @@ import java.util.Arrays;
  */
 public class ExUtils {
     @NonNull
-    public static Explorable newExplorable(String curPath) {
+    public static Explorer.Explorable newExplorable(String curPath) {
         return curPath.contains("/") ? new ExFile(curPath) : new ExClass(curPath);
     }
 
