@@ -99,7 +99,7 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
         },
         click() {
             @Override
-            public void onAction(Context context, Explorer.ExplorerContainer container) {
+            public void onAction(Context context, Object hack) {
                 ExUtils.error("click");
             }
         },
@@ -107,15 +107,15 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
         Explorer.Explorable ex;
 
         @Override
-        public void onAction(Context context, Explorer.ExplorerContainer container) {
+        public void onAction(Context context, Object hack) {
             if (ex == null) {
                 String path = getPath(context);
                 if (path != null) {
                     ex = ExUtils.newExplorable(path);
                 }
             }
-            if (ex != null && container != null) {
-                container.openExplorable(ex);
+            if (ex != null) {
+                ((ExplorerFragment) hack).openExplorable(ex);
             }
         }
 
@@ -176,7 +176,6 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
         openExplorable(ExUtils.newExplorable(curPath));
     }
 
-    @Override
     public void openExplorable(Explorer.Explorable ex) {
         if (ex == null) {
             ExUtils.error("无访问权限的item");

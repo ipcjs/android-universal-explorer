@@ -29,14 +29,14 @@ public class ExplorerActivity extends AppCompatActivity {
     enum Action implements Explorer.OnActionListener {
         action() {
             @Override
-            public void onAction(Context context, Explorer.ExplorerContainer container) {
+            public void onAction(Context context, Object hack) {
                 Toast.makeText(context, "action", Toast.LENGTH_SHORT).show();
             }
         },
         /**/;
 
         @Override
-        public void onAction(Context context, Explorer.ExplorerContainer container) {
+        public void onAction(Context context, Object hack) {
 
         }
     }

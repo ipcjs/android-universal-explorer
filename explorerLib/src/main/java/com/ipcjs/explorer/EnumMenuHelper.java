@@ -10,17 +10,17 @@ import android.view.MenuItem;
 public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener> {
     private Class<ACTION> mEnumType;
     private Context mContext;
-    private Explorer.ExplorerContainer mContainer;
+    private Object mHack;
 
     /**
      * @param enumType
-     * @param context   传递给: {@link ACTION#onAction(Context, Explorer.ExplorerContainer)}
-     * @param container 传递给: {@link ACTION#onAction(Context, Explorer.ExplorerContainer)}
+     * @param context  传递给: {@link ACTION#onAction(Context, Object)}
+     * @param hack     传递给: {@link ACTION#onAction(Context, Object)}
      */
-    public EnumMenuHelper(Class<ACTION> enumType, Context context, Explorer.ExplorerContainer container) {
+    public EnumMenuHelper(Class<ACTION> enumType, Context context, Object hack) {
         mEnumType = enumType;
         mContext = context;
-        mContainer = container;
+        mHack = hack;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -36,7 +36,7 @@ public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener> {
         if (mEnumType.getName().equals(item.getTitleCondensed().toString())) {
             /*这里的类型貌似写ACTION会报错~, 故先写Enum, 再强转~~*/
             Enum action = Enum.valueOf(mEnumType, item.getTitle().toString());
-            ((ACTION) action).onAction(mContext, mContainer);
+            ((ACTION) action).onAction(mContext, mHack);
             return true;
         } else {
             return false;

@@ -8,8 +8,7 @@ import java.util.List;
  * Created by JiangSong on 2015/12/4.
  */
 public interface Explorer {
-    interface Explorable extends OnActionListener {
-        @Override
+    interface Explorable {
         void onAction(Context context, ExplorerContainer container);
 
         Explorable getParent();
@@ -25,14 +24,12 @@ public interface Explorer {
     }
 
     interface OnActionListener {
-        void onAction(Context context, ExplorerContainer container);
+        void onAction(Context context, Object hack);
     }
 
     interface ExplorerContainer {
         int getContainId();
 
         List<String> getExploreRange();
-
-        void openExplorable(Explorable ex);
     }
 }
