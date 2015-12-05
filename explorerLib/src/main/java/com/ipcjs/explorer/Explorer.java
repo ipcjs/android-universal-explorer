@@ -2,6 +2,8 @@ package com.ipcjs.explorer;
 
 import android.content.Context;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 /**
@@ -31,5 +33,10 @@ public interface Explorer {
         int getContainId();
 
         List<String> getExploreRange();
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface ExClassName {
+        String value();
     }
 }

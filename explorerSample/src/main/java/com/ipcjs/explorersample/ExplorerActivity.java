@@ -17,6 +17,7 @@ import com.ipcjs.explorer.ExplorerFragment;
 /**
  * Created by JiangSong on 2015/12/2.
  */
+@Explorer.ExClassName("浏览器")
 public class ExplorerActivity extends AppCompatActivity {
     public static final Class[] sClassArray = {
             TestFragment.class,

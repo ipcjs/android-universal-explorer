@@ -129,8 +129,20 @@ public class ExClass implements Explorer.Explorable {
 
     @Override
     public String getName() {
+        if (!isDir()) {// 非目录, 试图读取注解中的title
+            try {
+                Class<?> cls = Class.forName(mPackage);
+                Explorer.ExClassName exClassName = cls.getAnnotation(Explorer.ExClassName.class);
+                if (exClassName != null) {
+                    return exClassName.value();// 返回注解中的title
+                }
+            } catch (ClassNotFoundException e) {
+                // ignore
+            }
+        }
+
         String[] split = sSplitPattern.split(mPackage);
-        return split[split.length - 1];
+        return split[split.length - 1];// 返回mPackage的最后一段
     }
 
     @Override
@@ -143,7 +155,6 @@ public class ExClass implements Explorer.Explorable {
         return !(mPackage != null ? !mPackage.equals(aExClass.mPackage) : aExClass.mPackage != null);
 
     }
-
     @Override
     public int hashCode() {
         return mPackage != null ? mPackage.hashCode() : 0;
