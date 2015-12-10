@@ -6,12 +6,16 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import static com.ipcjs.explorer.ExUtils.error;
 
 /**
  * Created by JiangSong on 2015/12/2.
@@ -48,13 +52,7 @@ public class ExClass implements Explorer.Explorable {
                 }
                 context.startActivity(intent);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && Fragment.class.isAssignableFrom(cls)) {
-                if (context instanceof Activity) {
-                    ((Activity) context).setTitle(cls.getSimpleName());
-                    ((Activity) context).getFragmentManager().beginTransaction()
-                            .replace(getContainerId(container), Fragment.instantiate(context, cls.getName(), null), cls.getName())
-                            .addToBackStack(null)
-                            .commit();
-                }
+                replaceFragment(context, container, cls, cls, null, false);
                 // 试图移除ExplorerFragment
                 if (container instanceof ExplorerFragment && context instanceof FragmentActivity) {
                     ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
@@ -63,21 +61,43 @@ public class ExClass implements Explorer.Explorable {
                             .commit();
                 }
             } else if (android.support.v4.app.Fragment.class.isAssignableFrom(cls)) {
-                if (context instanceof FragmentActivity) {
-                    ((FragmentActivity) context).setTitle(cls.getSimpleName());
-                    ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
-                            .replace(getContainerId(container), android.support.v4.app.Fragment.instantiate(context, cls.getName(), null), cls.getName())
-                            .addToBackStack(null)
-                            .commit();
-                }
+                replaceFragment(context, container, cls, cls, null, true);
+            } else if (View.class.isAssignableFrom(cls)) {
+                final Bundle args = new Bundle();
+                args.putSerializable(ViewWrapperFragment.ARG_VIEW_CLASS, cls);
+                replaceFragment(context, container, cls, ViewWrapperFragment.class, args, true);
             } else {
                 // public static void main(String... args);
                 Method mainMethod = cls.getMethod("main", new String[]{}.getClass());
                 mainMethod.invoke(null, new Object[]{new String[]{}});// 这样才能和args对应...
-                ExUtils.error("执行main(), " + cls.getSimpleName());
+                error("执行main(), " + cls.getSimpleName());
             }
         } catch (Exception e) {
-            ExUtils.error(e, e.getMessage());
+            error(e, e.toString());
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void replaceFragment(Context context, Explorer.ExplorerContainer container, Class<?> cls,
+                                 Class fragmentClass, Bundle args, boolean isV4) {
+        if (!(context instanceof Activity)) {
+            return;
+        }
+        ((Activity) context).setTitle(cls.getSimpleName());
+        final int containerId = getContainerId(container);
+        final String tag = cls.getName();
+        if (!isV4) {// app包的fgt
+            ((Activity) context).getFragmentManager().beginTransaction()
+                    .replace(containerId, Fragment.instantiate(context, fragmentClass.getName(), args), tag)
+                    .addToBackStack(null)
+                    .commit();
+        } else if (context instanceof FragmentActivity) {// v4包的fgt, 且context为FragmentActivity
+            ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
+                    .replace(containerId, android.support.v4.app.Fragment.instantiate(context, fragmentClass.getName(), args), tag)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            error("v4包的fgt, 放到Activity中..., da me");
         }
     }
 
@@ -155,6 +175,7 @@ public class ExClass implements Explorer.Explorable {
         return !(mPackage != null ? !mPackage.equals(aExClass.mPackage) : aExClass.mPackage != null);
 
     }
+
     @Override
     public int hashCode() {
         return mPackage != null ? mPackage.hashCode() : 0;

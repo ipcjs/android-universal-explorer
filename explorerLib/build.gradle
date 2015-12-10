@@ -38,7 +38,7 @@ publishing {
         explorer(MavenPublication) {
             groupId 'com.github.ipcjs'
             artifactId 'universal-explorer'
-            version '0.1.1'
+            version '0.1.2'
             artifact(sourcesJar)// 打包src
             artifact(javadocJar)// 打包doc
             artifact("$buildDir/outputs/aar/${project.name}-release.aar")// 打包arr文件

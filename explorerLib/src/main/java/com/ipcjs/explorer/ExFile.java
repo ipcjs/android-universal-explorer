@@ -54,7 +54,7 @@ public class ExFile implements Explorer.Explorable {
                         ExUtils.copy(inFile, outFile);
                         return RESULT_OK;
                     } catch (IOException e) {
-                        return e.getMessage();
+                        return e.toString();
                     }
                 }
 
@@ -86,7 +86,7 @@ public class ExFile implements Explorer.Explorable {
         try {
             context.startActivity(intent.setDataAndType(data, type));
         } catch (Exception e) {// 若没找到Activity, 会抛异常~~
-            ExUtils.error(e, getClass().getSimpleName(), e.getMessage());
+            ExUtils.error(e, getClass().getSimpleName(), e.toString());
             context.startActivity(intent.setDataAndType(data, "*/*"));
         }
     }
