@@ -135,7 +135,9 @@ public class ExClass implements Explorer.Explorable {
                     pkg = name;
                 }
                 final ExClass node = new ExClass(pkg);
-                list.remove(node);
+                if (node.isDir()) {// 只有目录要去重
+                    list.remove(node);
+                }
                 list.add(node);
             }
         }

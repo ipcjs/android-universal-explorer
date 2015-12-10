@@ -26,6 +26,7 @@ public class ExplorerActivity extends AppCompatActivity {
             ExplorerActivity.class,
             AppFragment.class,
             CustomView.class,
+            TestFragment.class,
     };
 
     enum Action implements Explorer.OnActionListener {
