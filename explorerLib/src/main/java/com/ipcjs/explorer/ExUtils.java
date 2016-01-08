@@ -16,12 +16,75 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 
 /**
  * Created by JiangSong on 2015/12/3.
  */
 public class ExUtils {
+    private static Context sApplication;
+    private static final int STE_CALLER = 3;
+
+    public static Context getApplication() {
+        return sApplication;
+    }
+
+    /**
+     * 初始化环境
+     */
+    public static void initEnvironment(Context context) {
+        sApplication = context.getApplicationContext();
+        forceShowOverflowMenu(context);
+    }
+
+    /**
+     * 打印
+     * @param objs
+     */
+    public static void p(Object... objs) {
+        Log.i("ipcjs:" + getSTEMethodMsg(Thread.currentThread().getStackTrace()[STE_CALLER]), Arrays.deepToString(objs));
+    }
+
+    /**
+     * 提取{@link StackTraceElement}的方法信息
+     * <br>形如:className.methodName(L:lineNumber)
+     * @param ste
+     * @return
+     */
+    private static String getSTEMethodMsg(StackTraceElement ste) {
+        String callerClazzName = ste.getClassName();
+        callerClazzName = callerClazzName.substring(callerClazzName.lastIndexOf(".") + 1);
+        return String.format("%s.%s(L:%d)", callerClazzName, ste.getMethodName(), ste.getLineNumber());
+    }
+
+    public static <F> String value2Str(Class<?> cls, F value, String prefix) {
+        String result = "unknown_value";
+        Field[] fields = cls.getFields();
+        for (Field field : fields) {
+            int modifiers = field.getModifiers();
+            // 如果修饰符是 public static final
+            if (Modifier.isFinal(modifiers) && Modifier.isPublic(modifiers)
+                    && Modifier.isStatic(modifiers)) {
+                try {
+                    Object object = field.get(null);
+                    if (value.equals(object)) {
+                        // "hehe".startsWith("") 返回true
+                        if (field.getName().toLowerCase().startsWith(prefix.toLowerCase())) {
+                            result = field.getName();
+                            break;
+                        }
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result + "(" + value + ")";
+    }
+
     @NonNull
     public static Explorer.Explorable newExplorable(String curPath) {
         return curPath.contains("/") ? new ExFile(curPath) : new ExClass(curPath);
@@ -32,10 +95,10 @@ public class ExUtils {
     }
 
     public static void error(Throwable e, Object... objs) {
-        String msg = Arrays.toString(objs);
+        String msg = Arrays.deepToString(objs);
         Log.e("explorer", msg);
-        if (ExplorerFragment.getApplication() != null) {
-            Toast.makeText(ExplorerFragment.getApplication(), msg, Toast.LENGTH_SHORT).show();
+        if (getApplication() != null) {
+            Toast.makeText(getApplication(), msg, Toast.LENGTH_SHORT).show();
         }
         if (e != null) {
             e.printStackTrace();
@@ -116,7 +179,7 @@ public class ExUtils {
         try {
             ViewConfiguration config = ViewConfiguration.get(context);
             Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-            if(menuKeyField != null) {
+            if (menuKeyField != null) {
                 menuKeyField.setAccessible(true);
                 menuKeyField.setBoolean(config, false);
             }

@@ -29,11 +29,6 @@ import java.util.List;
  */
 public class ExplorerFragment extends Fragment implements AdapterView.OnItemClickListener, Explorer.ExplorerContainer {
     public static final String ARG_ALL_CLASS = "all_class";
-    private static Context sApplication;
-
-    public static Context getApplication() {
-        return sApplication;
-    }
 
     public static void setupExplorer(FragmentActivity activity, Class... clss) {
         FragmentManager fm = activity.getSupportFragmentManager();
@@ -145,9 +140,8 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ExUtils.initEnvironment(getContext());
         mEnumMenuHelper = new EnumMenuHelper<>(DirAction.class, getContext(), this);
-        sApplication = getContext().getApplicationContext();
-        ExUtils.forceShowOverflowMenu(getContext());
         if (getArguments() != null) {
             mAllClass = getArguments().getStringArrayList(ARG_ALL_CLASS);
         }
