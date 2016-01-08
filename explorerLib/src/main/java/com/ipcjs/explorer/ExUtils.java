@@ -23,6 +23,7 @@ import java.util.Arrays;
  * Created by JiangSong on 2015/12/3.
  */
 public class ExUtils {
+    public static final String TAG = "explorer";
     private static Context sApplication;
     private static final int STE_CALLER = 3;
 
@@ -43,7 +44,7 @@ public class ExUtils {
      * @param objs
      */
     public static void p(Object... objs) {
-        Log.i("explorerLog", getSTEMethodMsg(Thread.currentThread().getStackTrace()[STE_CALLER]) + ":" + Arrays.deepToString(objs));
+        Log.i(TAG, getSTEMethodMsg(Thread.currentThread().getStackTrace()[STE_CALLER]) + ":" + Arrays.deepToString(objs));
     }
 
     /**
@@ -96,7 +97,7 @@ public class ExUtils {
 
     public static void error(Throwable e, Object... objs) {
         String msg = Arrays.deepToString(objs);
-        Log.e("explorerError", msg);
+        Log.e(TAG, msg);
         if (getApplication() != null) {
             Toast.makeText(getApplication(), msg, Toast.LENGTH_SHORT).show();
         }
