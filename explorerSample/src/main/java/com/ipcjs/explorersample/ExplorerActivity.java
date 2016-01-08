@@ -29,22 +29,22 @@ public class ExplorerActivity extends AppCompatActivity {
             TestFragment.class,
     };
 
-    enum Action implements Explorer.OnActionListener {
+    enum Action implements Explorer.OnActionListener<ExplorerActivity> {
         action() {
             @Override
-            public void onAction(Context context, Object hack) {
+            public void onAction(Context context, ExplorerActivity hack) {
                 Toast.makeText(context, "action", Toast.LENGTH_SHORT).show();
             }
         },
         /**/;
 
         @Override
-        public void onAction(Context context, Object hack) {
+        public void onAction(Context context, ExplorerActivity hack) {
 
         }
     }
 
-    private EnumMenuHelper<Action> mEnumMenuHelper;
+    private EnumMenuHelper<Action, ExplorerActivity> mEnumMenuHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +52,7 @@ public class ExplorerActivity extends AppCompatActivity {
         TextView tv = new TextView(this);
         tv.setText("");
         setContentView(tv);// 调用一次setContentView(), 触发ensureSubDecor(), 使Toolbar下面的部分变成android.R.id.content~~
-        mEnumMenuHelper = new EnumMenuHelper<>(Action.class, this, null);
+        mEnumMenuHelper = new EnumMenuHelper<>(Action.class, this, this);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(android.R.id.content, ExplorerFragment.newInstance(sClassArray), ExplorerFragment.class.getName())

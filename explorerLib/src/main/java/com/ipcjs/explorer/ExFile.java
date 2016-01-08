@@ -45,7 +45,7 @@ public class ExFile implements Explorer.Explorable {
 
                 @Override
                 protected void onPreExecute() {
-                    ExUtils.error("复制文件%s到%s", inFile.getName(), outFile.getPath());
+                    ExUtils.error(String.format("复制文件%s到%s", inFile.getName(), outFile.getPath()));
                 }
 
                 @Override

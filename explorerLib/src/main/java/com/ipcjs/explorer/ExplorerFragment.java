@@ -7,6 +7,8 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +33,17 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
 
     public static Context getApplication() {
         return sApplication;
+    }
+
+    public static void setupExplorer(FragmentActivity activity, Class... clss) {
+        FragmentManager fm = activity.getSupportFragmentManager();
+        String tag = ExplorerFragment.class.getName();
+        Fragment fragment = fm.findFragmentByTag(tag);
+        if (fragment == null) {
+            fm.beginTransaction()
+                    .replace(android.R.id.content, newInstance(clss), tag)
+                    .commit();
+        }
     }
 
     public static ExplorerFragment newInstance(Class... clss) {
@@ -67,7 +80,7 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
         return mAllClass;
     }
 
-    private enum DirAction implements Explorer.OnActionListener {
+    private enum DirAction implements Explorer.OnActionListener<ExplorerFragment> {
         app_dir() {
             @Override
             public String getPath(Context context) {
@@ -99,7 +112,7 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
         },
         click() {
             @Override
-            public void onAction(Context context, Object hack) {
+            public void onAction(Context context, ExplorerFragment hack) {
                 ExUtils.error("click");
             }
         },
@@ -107,7 +120,7 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
         Explorer.Explorable ex;
 
         @Override
-        public void onAction(Context context, Object hack) {
+        public void onAction(Context context, ExplorerFragment hack) {
             if (ex == null) {
                 String path = getPath(context);
                 if (path != null) {
@@ -115,7 +128,7 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
                 }
             }
             if (ex != null) {
-                ((ExplorerFragment) hack).openExplorable(ex);
+                hack.openExplorable(ex);
             }
         }
 
@@ -127,7 +140,7 @@ public class ExplorerFragment extends Fragment implements AdapterView.OnItemClic
     private SharedPreferences mPref;
     private ListView mListView;
     private ExplorerAdapter mAdapter;
-    private EnumMenuHelper<DirAction> mEnumMenuHelper;
+    private EnumMenuHelper<DirAction, ExplorerFragment> mEnumMenuHelper;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

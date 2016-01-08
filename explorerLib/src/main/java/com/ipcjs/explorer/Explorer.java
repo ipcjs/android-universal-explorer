@@ -25,8 +25,8 @@ public interface Explorer {
 
     }
 
-    interface OnActionListener {
-        void onAction(Context context, Object hack);
+    interface OnActionListener<HACK> {
+        void onAction(Context context, HACK hack);
     }
 
     interface ExplorerContainer {

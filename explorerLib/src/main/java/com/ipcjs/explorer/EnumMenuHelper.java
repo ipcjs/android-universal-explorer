@@ -7,17 +7,17 @@ import android.view.MenuItem;
 /**
  * Created by JiangSong on 2015/12/3.
  */
-public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener> {
+public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener<HACK>, HACK> {
     private Class<ACTION> mEnumType;
     private Context mContext;
-    private Object mHack;
+    private HACK mHack;
 
     /**
      * @param enumType
      * @param context  传递给: {@link ACTION#onAction(Context, Object)}
      * @param hack     传递给: {@link ACTION#onAction(Context, Object)}
      */
-    public EnumMenuHelper(Class<ACTION> enumType, Context context, Object hack) {
+    public EnumMenuHelper(Class<ACTION> enumType, Context context, HACK hack) {
         mEnumType = enumType;
         mContext = context;
         mHack = hack;
