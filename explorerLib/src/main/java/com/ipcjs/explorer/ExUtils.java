@@ -43,7 +43,7 @@ public class ExUtils {
      * @param objs
      */
     public static void p(Object... objs) {
-        Log.i("ipcjs:" + getSTEMethodMsg(Thread.currentThread().getStackTrace()[STE_CALLER]), Arrays.deepToString(objs));
+        Log.i("explorerLog", getSTEMethodMsg(Thread.currentThread().getStackTrace()[STE_CALLER]) + ":" + Arrays.deepToString(objs));
     }
 
     /**
@@ -96,7 +96,7 @@ public class ExUtils {
 
     public static void error(Throwable e, Object... objs) {
         String msg = Arrays.deepToString(objs);
-        Log.e("explorer", msg);
+        Log.e("explorerError", msg);
         if (getApplication() != null) {
             Toast.makeText(getApplication(), msg, Toast.LENGTH_SHORT).show();
         }
