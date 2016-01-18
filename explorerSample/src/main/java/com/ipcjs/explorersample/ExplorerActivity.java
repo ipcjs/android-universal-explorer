@@ -52,7 +52,7 @@ public class ExplorerActivity extends AppCompatActivity {
         TextView tv = new TextView(this);
         tv.setText("");
         setContentView(tv);// 调用一次setContentView(), 触发ensureSubDecor(), 使Toolbar下面的部分变成android.R.id.content~~
-        mEnumMenuHelper = new EnumMenuHelper<>(Action.class, this, this);
+        mEnumMenuHelper = new EnumMenuHelper<Action, ExplorerActivity>(Action.class, this, this);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(android.R.id.content, ExplorerFragment.newInstance(sClassArray), ExplorerFragment.class.getName())

@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Created by JiangSong on 2015/12/2.
  */
-public class ExplorerFragment extends Fragment implements AdapterView.OnItemClickListener, Explorer.ExplorerContainer {
+public class ExplorerFragment extends FragmentCompat implements AdapterView.OnItemClickListener, Explorer.ExplorerContainer {
     public static final String ARG_ALL_CLASS = "all_class";
 
     public static void setupExplorer(FragmentActivity activity, Class... clss) {

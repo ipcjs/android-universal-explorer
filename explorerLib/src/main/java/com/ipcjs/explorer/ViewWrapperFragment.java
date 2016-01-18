@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,7 @@ import java.lang.reflect.Constructor;
 /**
  * Created by JiangSong on 2015/12/10.
  */
-public class ViewWrapperFragment extends Fragment {
+public class ViewWrapperFragment extends FragmentCompat {
 
     public static final String ARG_VIEW_CLASS = "viewClass";
 
