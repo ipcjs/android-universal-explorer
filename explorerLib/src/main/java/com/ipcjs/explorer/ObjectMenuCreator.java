@@ -8,6 +8,7 @@ import android.view.MenuItem;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.ipcjs.explorer.ExUtils.error;
@@ -16,68 +17,83 @@ import static com.ipcjs.explorer.ExUtils.p;
 /**
  * Created by JiangSong on 2016/1/19.
  */
-public class ObjectMenuCreator implements Explorer.IMenuCreator {
-
+public class ObjectMenuCreator implements Explorer.MenuCreator {
     private int mGroupId;
     private static Explorer.MenuItem sDefaultMenuItem;
 
     private static synchronized Explorer.MenuItem getDefaultMenuItem() {
         if (sDefaultMenuItem == null) {
-            sDefaultMenuItem = ExUtils.newAnnotationInstance(Explorer.MenuItem.class);
+            sDefaultMenuItem = ExUtils.newAnnotation(Explorer.MenuItem.class);
         }
         return sDefaultMenuItem;
     }
 
+    /** mContext暂时没用~~ */
     private Context mContext;
     private Object mObject;
 
     public ObjectMenuCreator() {
-        this(null);
     }
 
     public ObjectMenuCreator(Object object) {
-        this(null, object);
-    }
-
-    public ObjectMenuCreator(Context context, Object object) {
-        mContext = context;
         setObject(object);
     }
 
-    public void setObject(Object object) {
+    public ObjectMenuCreator setContext(Context context) {
+        mContext = context;
+        return this;
+    }
+
+    public ObjectMenuCreator setObject(Object object) {
         if (object == null) {
             error("object不能为null");
-            return;
+        } else {
+            setObject(object, object.getClass(), METHOD_RANGE_DEFAULT);
         }
-        setObject(object, object.getClass(), true);
+        return this;
     }
+
+    /** 添加声明的方法 */
+    public static final int METHOD_RANGE_DECLARED = 1;
+    /** 添加public的方法 */
+    public static final int METHOD_RANGE_PUBLIC = 2;
+    /** 必须要有MenuItem注解才添加 */
+    public static final int METHOD_RANGE_MUST_HAS_MENU_ITEM = 4;
+    /** 默认值 */
+    public static final int METHOD_RANGE_DEFAULT = METHOD_RANGE_DECLARED | METHOD_RANGE_PUBLIC | METHOD_RANGE_MUST_HAS_MENU_ITEM;
 
     /**
      * @param object
      * @param cls
-     * @param mustHasMenuItemAnnotation
+     * @param methodRangeFlag
+     * @return
      */
-    public void setObject(Object object, Class cls, boolean mustHasMenuItemAnnotation) {
+    public ObjectMenuCreator setObject(Object object, Class cls, int methodRangeFlag) {
         if (object == null && cls == null) {
             error("object和cls不能同时为null");
-            return;
+        } else {
+            mObject = object;
+            // object为null则使用cls的hasCode
+            mGroupId = mObject == null ? cls.hashCode() : mObject.hashCode();
+            // cls为null则使用object.getClass
+            parseClass(cls == null ? mObject.getClass() : cls, methodRangeFlag);
         }
-        mObject = object;
-        // object为null则使用cls的hasCode
-        mGroupId = mObject == null ? cls.hashCode() : mObject.hashCode();
-        // cls为null则使用object.getClass
-        parseClass(cls == null ? mObject.getClass() : cls, mustHasMenuItemAnnotation);
+        return this;
     }
 
     private List<Method> mMethodList = new ArrayList<>();
 
-    private void parseClass(Class cls, boolean mustHasMenuItemAnnotation) {
+    private void parseClass(Class cls, int methodRangeFlag) {
         mMethodList.clear();
-        final Method[] methods = cls.getMethods();
-        final Method[] declaredMethods = cls.getDeclaredMethods();
-
-        for (int i = 0; i < methods.length + declaredMethods.length; i++) {
-            Method method = i < methods.length ? methods[i] : declaredMethods[i - methods.length];
+        List<Method> tmpList = new ArrayList<>();
+        if ((methodRangeFlag & METHOD_RANGE_PUBLIC) != 0) {
+            tmpList.addAll(Arrays.asList(cls.getMethods()));
+        }
+        if ((methodRangeFlag & METHOD_RANGE_DECLARED) != 0) {
+            tmpList.addAll(Arrays.asList(cls.getDeclaredMethods()));
+        }
+        boolean mustHasMenuItemAnnotation = (methodRangeFlag & METHOD_RANGE_MUST_HAS_MENU_ITEM) != 0;
+        for (Method method : tmpList) {
             if (!mustHasMenuItemAnnotation || method.isAnnotationPresent(Explorer.MenuItem.class)) {
                 if (BuildConfig.DEBUG) p(method);
                 if (!method.isAccessible()) {
@@ -121,7 +137,10 @@ public class ObjectMenuCreator implements Explorer.IMenuCreator {
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
         if (item.getGroupId() == mGroupId) {
             try {
-                mMethodList.get(item.getItemId()).invoke(mObject);
+                Object result = mMethodList.get(item.getItemId()).invoke(mObject);
+                if (result != null) {
+                    error("result", result);
+                }
                 return true;
             } catch (/*IllegalAccessException | InvocationTarget*/Exception e) {
                 error(e, e.toString());

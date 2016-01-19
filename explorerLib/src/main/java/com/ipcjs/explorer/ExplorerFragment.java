@@ -1,6 +1,5 @@
 package com.ipcjs.explorer;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -9,10 +8,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,7 +26,7 @@ import java.util.List;
 /**
  * Created by JiangSong on 2015/12/2.
  */
-public class ExplorerFragment extends FragmentCompat implements AdapterView.OnItemClickListener, Explorer.ExplorerContainer {
+public class ExplorerFragment extends MenuFragment implements AdapterView.OnItemClickListener, Explorer.ExplorerContainer {
     public static final String ARG_ALL_CLASS = "all_class";
 
     public static void setupExplorer(FragmentActivity activity, Class... clss) {
@@ -75,73 +74,35 @@ public class ExplorerFragment extends FragmentCompat implements AdapterView.OnIt
         return mAllClass;
     }
 
-    private enum DirAction implements Explorer.OnActionListener<ExplorerFragment> {
-        app_dir() {
-            @Override
-            public String getPath(Context context) {
-                return context.getFilesDir().getParentFile().getAbsolutePath();
-            }
-        },
-        app_ext_dir() {
-            public String getPath(Context context) {
-                return ExUtils.getDir(context, false, true).getParentFile().getAbsolutePath();
-            }
-        },
-        ext_dir() {
-            @Override
-            public String getPath(Context context) {
-                return Environment.getExternalStorageDirectory().getAbsolutePath();
-            }
-        },
-        root_dir() {
-            @Override
-            public String getPath(Context context) {
-                return "/";
-            }
-        },
-        pkg_class() {
-            @Override
-            public String getPath(Context context) {
-                return context.getPackageName() + ExClass.DOT;
-            }
-        },
-        click() {
-            @Override
-            public void onAction(Context context, ExplorerFragment hack) {
-                ExUtils.error("click");
-            }
-        },
-            /*end*/;
-        Explorer.Explorable ex;
-
-        @Override
-        public void onAction(Context context, ExplorerFragment hack) {
-            if (ex == null) {
-                String path = getPath(context);
-                if (path != null) {
-                    ex = ExUtils.newExplorable(path);
-                }
-            }
-            if (ex != null) {
-                hack.openExplorable(ex);
-            }
-        }
-
-        public String getPath(Context context) {
-            return "";// 空串也是一个合法的path..., 表示根包..
-        }
-    }
-
     private SharedPreferences mPref;
     private ListView mListView;
     private ExplorerAdapter mAdapter;
-    private EnumMenuHelper<DirAction, ExplorerFragment> mEnumMenuHelper;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        getMenuCreatorList().add(new ObjectMenuCreator().setObject(new Object() {
+            void app_dir() {
+                openExplorable(getContext().getFilesDir().getParentFile().getAbsolutePath());
+            }
+
+            void app_ext_dir() {
+                openExplorable(ExUtils.getDir(getContext(), false, true).getParentFile().getAbsolutePath());
+            }
+
+            void ext_dir() {
+                openExplorable(Environment.getExternalStorageDirectory().getAbsolutePath());
+            }
+
+            void root_dir() {
+                openExplorable("/");
+            }
+
+            void pkg_class() {
+                openExplorable(getContext().getPackageName() + ExClass.SPLIT_DOT);
+            }
+        }, null, ObjectMenuCreator.METHOD_RANGE_DECLARED));
         super.onCreate(savedInstanceState);
         ExUtils.initEnvironment(getContext());
-        mEnumMenuHelper = new EnumMenuHelper<>(DirAction.class, getContext(), this);
         if (getArguments() != null) {
             mAllClass = getArguments().getStringArrayList(ARG_ALL_CLASS);
         }
@@ -155,20 +116,8 @@ public class ExplorerFragment extends FragmentCompat implements AdapterView.OnIt
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setHasOptionsMenu(mEnumMenuHelper.getItemCount() > 0);
         mListView = new ListView(getContext());
         return mListView;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        mEnumMenuHelper.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return mEnumMenuHelper.onOptionsItemSelected(item);
     }
 
     @Override
@@ -179,8 +128,12 @@ public class ExplorerFragment extends FragmentCompat implements AdapterView.OnIt
         mListView.setOnItemClickListener(this);
 
         mPref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String curPath = mPref.getString(PREF_KEY_CUR_PATH, DirAction.pkg_class.getPath(getContext()));
-        openExplorable(ExUtils.newExplorable(curPath));
+        String curPath = mPref.getString(PREF_KEY_CUR_PATH, getContext().getPackageName() + ExClass.SPLIT_DOT);
+        openExplorable(curPath);
+    }
+
+    public void openExplorable(String path) {
+        openExplorable(ExUtils.newExplorable(path));
     }
 
     public void openExplorable(Explorer.Explorable ex) {
@@ -261,7 +214,16 @@ public class ExplorerFragment extends FragmentCompat implements AdapterView.OnIt
             } else {
                 name = "无访问权限的item";
             }
-            holder.tvTitle.setText(name);
+            int splitIndex = name.indexOf(ExClass.SPLIT_LF);
+            CharSequence text;
+            if (splitIndex != -1) {// 缩小回车符之后的文本
+                SpannableString ss = new SpannableString(name);
+                ss.setSpan(new RelativeSizeSpan(0.8f), splitIndex, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                text = ss;
+            } else {
+                text = name;
+            }
+            holder.tvTitle.setText(text);
         }
     }
 

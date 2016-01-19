@@ -193,7 +193,7 @@ public class ExUtils {
         }
     }
 
-    public static <A extends Annotation> A newAnnotationInstance(Class<A> annotation) {
+    public static <A extends Annotation> A newAnnotation(Class<A> annotation) {
         return (A) Proxy.newProxyInstance( // 使用动态代理创建一个实现了注解的类。。。
                 annotation.getClassLoader(),
                 new Class[]{annotation},

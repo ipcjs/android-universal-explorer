@@ -9,7 +9,7 @@ import android.view.MenuItem;
  * 使用太过繁琐, 废弃, 使用{@link ObjectMenuCreator}替代
  */
 @Deprecated
-public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener<HACK>, HACK> implements Explorer.IMenuCreator {
+public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener<HACK>, HACK> implements Explorer.MenuCreator {
     private Class<ACTION> mEnumType;
     private Context mContext;
     private HACK mHack;

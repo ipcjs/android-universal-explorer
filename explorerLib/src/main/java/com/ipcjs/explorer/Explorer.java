@@ -48,12 +48,13 @@ public interface Explorer {
     @Retention(RetentionPolicy.RUNTIME)
     @interface ExClassName {
         String value();
+        String summary() default "";
     }
 
     /**
      * Created by JiangSong on 2016/1/19.
      */
-    interface IMenuCreator {
+    interface MenuCreator {
         boolean onCreateOptionsMenu(Menu menu);
 
         boolean onOptionsItemSelected(android.view.MenuItem item);

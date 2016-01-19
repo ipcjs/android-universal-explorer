@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.View;
 
 import java.lang.reflect.Method;
@@ -22,7 +23,8 @@ import static com.ipcjs.explorer.ExUtils.error;
  */
 public class ExClass implements Explorer.Explorable {
     private static final Pattern sSplitPattern = Pattern.compile("\\.");
-    public static final char DOT = '.';
+    public static final char SPLIT_DOT = '.';
+    public static final char SPLIT_LF = '\n';
     private String mPackage;
 
     public ExClass(String pkg) {
@@ -109,14 +111,14 @@ public class ExClass implements Explorer.Explorable {
         String[] split = sSplitPattern.split(mPackage);
         StringBuilder parent = new StringBuilder();
         for (int i = 0; i < split.length - 1/*除了最后一段, 其他段组成parent*/; i++) {
-            parent.append(split[i]).append(DOT);
+            parent.append(split[i]).append(SPLIT_DOT);
         }
         return new ExClass(parent.toString());
     }
 
     @Override
     public boolean isDir() {
-        return mPackage.isEmpty() || mPackage.charAt(mPackage.length() - 1) == DOT;
+        return mPackage.isEmpty() || mPackage.charAt(mPackage.length() - 1) == SPLIT_DOT;
     }
 
     @Override
@@ -127,7 +129,7 @@ public class ExClass implements Explorer.Explorable {
         final ArrayList<Explorer.Explorable> list = new ArrayList<>();
         for (String name : container.getExploreRange()) {
             if (name.startsWith(mPackage)) {
-                int nextDotIndex = name.indexOf(DOT, mPackage.length());
+                int nextDotIndex = name.indexOf(SPLIT_DOT, mPackage.length());
                 String pkg;
                 if (nextDotIndex != -1) {
                     pkg = name.substring(0, nextDotIndex + 1);
@@ -156,7 +158,10 @@ public class ExClass implements Explorer.Explorable {
                 Class<?> cls = Class.forName(mPackage);
                 Explorer.ExClassName exClassName = cls.getAnnotation(Explorer.ExClassName.class);
                 if (exClassName != null) {
-                    return exClassName.value();// 返回注解中的title
+                    String title = exClassName.value();// 返回注解中的title
+                    String summary = exClassName.summary();
+                    // 使用'\n'拆分title和summary
+                    return title + (TextUtils.isEmpty(summary) ? "" : SPLIT_LF + summary);
                 }
             } catch (ClassNotFoundException e) {
                 // ignore

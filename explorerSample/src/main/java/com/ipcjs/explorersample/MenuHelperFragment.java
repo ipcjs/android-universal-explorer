@@ -8,12 +8,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.ipcjs.explorer.Explorer;
-import com.ipcjs.explorer.MenuFragmentCompat;
+import com.ipcjs.explorer.MenuFragment;
+import com.ipcjs.explorer.ObjectMenuCreator;
+
+import static com.ipcjs.explorer.ExUtils.error;
 
 /**
  * Created by JiangSong on 2016/1/19.
  */
-public class MenuHelperFragment extends MenuFragmentCompat {
+@Explorer.ExClassName(value = "菜单", summary = "使用ObjectMenuCreator自动创建菜单")
+public class MenuHelperFragment extends MenuFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -21,7 +25,14 @@ public class MenuHelperFragment extends MenuFragmentCompat {
     }
 
     @Explorer.MenuItem
-    private void todo() {
+    private int todo() {
+        error("todo");
+        return 0;
+    }
 
+    @Explorer.MenuItem
+    void menuView() {
+        getMenuCreatorList().add(new ObjectMenuCreator().setObject(getView(), null, ObjectMenuCreator.METHOD_RANGE_PUBLIC));
+        getActivity().supportInvalidateOptionsMenu();
     }
 }
