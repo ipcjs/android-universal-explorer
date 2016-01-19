@@ -15,8 +15,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 
 /**
@@ -187,5 +191,18 @@ public class ExUtils {
         } catch (Exception ex) {
             // Ignore
         }
+    }
+
+    public static <A extends Annotation> A newAnnotationInstance(Class<A> annotation) {
+        return (A) Proxy.newProxyInstance( // 使用动态代理创建一个实现了注解的类。。。
+                annotation.getClassLoader(),
+                new Class[]{annotation},
+                new InvocationHandler() {
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        return method.getDefaultValue();// 返回注解方法的默认值
+                    }
+                }
+        );
     }
 }

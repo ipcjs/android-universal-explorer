@@ -6,8 +6,10 @@ import android.view.MenuItem;
 
 /**
  * Created by JiangSong on 2015/12/3.
+ * 使用太过繁琐, 废弃, 使用{@link ObjectMenuCreator}替代
  */
-public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener<HACK>, HACK> {
+@Deprecated
+public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener<HACK>, HACK> implements Explorer.IMenuCreator {
     private Class<ACTION> mEnumType;
     private Context mContext;
     private HACK mHack;
@@ -23,6 +25,7 @@ public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener<HACK
         mHack = hack;
     }
 
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         ACTION[] enumArray = mEnumType.getEnumConstants();
         for (ACTION action : enumArray) {
@@ -32,6 +35,7 @@ public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener<HACK
         return enumArray.length > 0;
     }
 
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mEnumType.getName().equals(item.getTitleCondensed().toString())) {
             /*这里的类型貌似写ACTION会报错~, 故先写Enum, 再强转~~*/
@@ -43,6 +47,7 @@ public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener<HACK
         }
     }
 
+    @Override
     public int getItemCount() {
         return mEnumType.getEnumConstants().length;
     }
