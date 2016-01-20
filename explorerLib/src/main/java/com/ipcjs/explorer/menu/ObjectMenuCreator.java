@@ -1,10 +1,12 @@
-package com.ipcjs.explorer;
+package com.ipcjs.explorer.menu;
 
 import android.content.Context;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
 import android.view.Menu;
-import android.view.MenuItem;
+
+import com.ipcjs.explorer.BuildConfig;
+import com.ipcjs.explorer.ExUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,18 +14,19 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.ipcjs.explorer.ExUtils.error;
+import static com.ipcjs.explorer.ExUtils.info;
 import static com.ipcjs.explorer.ExUtils.p;
 
 /**
  * Created by JiangSong on 2016/1/19.
  */
-public class ObjectMenuCreator implements Explorer.MenuCreator {
+public class ObjectMenuCreator implements MenuCreator {
     private int mGroupId;
-    private static Explorer.MenuItem sDefaultMenuItem;
+    private static MenuItem sDefaultMenuItem;
 
-    private static synchronized Explorer.MenuItem getDefaultMenuItem() {
+    private static synchronized MenuItem getDefaultMenuItem() {
         if (sDefaultMenuItem == null) {
-            sDefaultMenuItem = ExUtils.newAnnotation(Explorer.MenuItem.class);
+            sDefaultMenuItem = ExUtils.newAnnotation(MenuItem.class);
         }
         return sDefaultMenuItem;
     }
@@ -94,7 +97,7 @@ public class ObjectMenuCreator implements Explorer.MenuCreator {
         }
         boolean mustHasMenuItemAnnotation = (methodRangeFlag & METHOD_RANGE_MUST_HAS_MENU_ITEM) != 0;
         for (Method method : tmpList) {
-            if (!mustHasMenuItemAnnotation || method.isAnnotationPresent(Explorer.MenuItem.class)) {
+            if (!mustHasMenuItemAnnotation || method.isAnnotationPresent(MenuItem.class)) {
                 if (BuildConfig.DEBUG) p(method);
                 if (!method.isAccessible()) {
                     method.setAccessible(true);
@@ -107,7 +110,7 @@ public class ObjectMenuCreator implements Explorer.MenuCreator {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        final Explorer.MenuItem defaultMenuItem = getDefaultMenuItem();
+        final MenuItem defaultMenuItem = getDefaultMenuItem();
         for (int i = 0; i < mMethodList.size(); i++) {
             final Method method = mMethodList.get(i);
             String title = method.getName();
@@ -116,7 +119,7 @@ public class ObjectMenuCreator implements Explorer.MenuCreator {
             boolean checkable = defaultMenuItem.checkable();
             int iconRes = defaultMenuItem.iconRes();
 
-            final Explorer.MenuItem annotation = method.getAnnotation(Explorer.MenuItem.class);
+            final MenuItem annotation = method.getAnnotation(MenuItem.class);
             if (annotation != null) {// 若有注解
                 order = annotation.order();
                 showAsAction = annotation.showAsAction();
@@ -125,7 +128,7 @@ public class ObjectMenuCreator implements Explorer.MenuCreator {
                 }
             }
             // 使用: mMethodList中的index作为itemId
-            final MenuItem item = menu.add(mGroupId, i, order, title);
+            final android.view.MenuItem item = menu.add(mGroupId, i, order, title);
             MenuItemCompat.setShowAsAction(item, showAsAction);
             item.setCheckable(checkable);
             item.setIcon(iconRes);
@@ -139,11 +142,11 @@ public class ObjectMenuCreator implements Explorer.MenuCreator {
             try {
                 Object result = mMethodList.get(item.getItemId()).invoke(mObject);
                 if (result != null) {
-                    error("result", result);
+                    info("result", result);
                 }
                 return true;
             } catch (/*IllegalAccessException | InvocationTarget*/Exception e) {
-                error(e, e.toString());
+                error(e);
             }
         }
         return false;

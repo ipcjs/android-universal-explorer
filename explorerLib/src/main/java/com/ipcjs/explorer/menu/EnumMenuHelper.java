@@ -1,15 +1,14 @@
-package com.ipcjs.explorer;
+package com.ipcjs.explorer.menu;
 
 import android.content.Context;
 import android.view.Menu;
-import android.view.MenuItem;
 
 /**
  * Created by JiangSong on 2015/12/3.
  * 使用太过繁琐, 废弃, 使用{@link ObjectMenuCreator}替代
  */
 @Deprecated
-public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener<HACK>, HACK> implements Explorer.MenuCreator {
+public class EnumMenuHelper<ACTION extends Enum & MenuCreator.OnActionListener<HACK>, HACK> implements MenuCreator {
     private Class<ACTION> mEnumType;
     private Context mContext;
     private HACK mHack;
@@ -29,14 +28,14 @@ public class EnumMenuHelper<ACTION extends Enum & Explorer.OnActionListener<HACK
     public boolean onCreateOptionsMenu(Menu menu) {
         ACTION[] enumArray = mEnumType.getEnumConstants();
         for (ACTION action : enumArray) {
-            MenuItem item = menu.add(action.name());
+            android.view.MenuItem item = menu.add(action.name());
             item.setTitleCondensed(mEnumType.getName());
         }
         return enumArray.length > 0;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
         if (mEnumType.getName().equals(item.getTitleCondensed().toString())) {
             /*这里的类型貌似写ACTION会报错~, 故先写Enum, 再强转~~*/
             Enum action = Enum.valueOf(mEnumType, item.getTitle().toString());

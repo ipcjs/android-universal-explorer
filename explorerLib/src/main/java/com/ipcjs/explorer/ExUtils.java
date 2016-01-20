@@ -44,14 +44,6 @@ public class ExUtils {
     }
 
     /**
-     * 打印
-     * @param objs
-     */
-    public static void p(Object... objs) {
-        Log.i(TAG, getSTEMethodMsg(Thread.currentThread().getStackTrace()[STE_CALLER]) + ":" + Arrays.deepToString(objs));
-    }
-
-    /**
      * 提取{@link StackTraceElement}的方法信息
      * <br>形如:className.methodName(L:lineNumber)
      * @param ste
@@ -95,19 +87,38 @@ public class ExUtils {
         return curPath.contains("/") ? new ExFile(curPath) : new ExClass(curPath);
     }
 
-    public static void error(Object... objs) {
-        error(null, objs);
+    /**
+     * 打印
+     * @param objs
+     */
+    public static void p(Object... objs) {
+        Log.i(TAG, getSTEMethodMsg(Thread.currentThread().getStackTrace()[STE_CALLER]) + ":" + Arrays.deepToString(objs));
     }
 
-    public static void error(Throwable e, Object... objs) {
+    public static void log(int priority, Throwable e, Object... objs) {
         String msg = Arrays.deepToString(objs);
-        Log.e(TAG, msg);
+        if (e != null) {
+            msg = e.toString() + ", " + msg;
+            e.printStackTrace();
+        }
+        Log.println(priority, TAG, msg);
         if (getApplication() != null) {
             Toast.makeText(getApplication(), msg, Toast.LENGTH_SHORT).show();
         }
-        if (e != null) {
-            e.printStackTrace();
-        }
+    }
+
+    public static void error(Throwable e, Object... objs) {
+        log(Log.ERROR, e, objs);
+    }
+
+    /** 信息 */
+    public static void info(Object... objs) {
+        log(Log.INFO, null, objs);
+    }
+
+    /** 错误 */
+    public static void error(Object... objs) {
+        error(null, objs);
     }
 
     /**

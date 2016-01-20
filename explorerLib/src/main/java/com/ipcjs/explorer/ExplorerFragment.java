@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,9 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.ipcjs.explorer.menu.MenuFragment;
+import com.ipcjs.explorer.menu.ObjectMenuCreator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,7 +84,7 @@ public class ExplorerFragment extends MenuFragment implements AdapterView.OnItem
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        getMenuCreatorList().add(new ObjectMenuCreator().setObject(new Object() {
+        getMultiMenuCreator().add(new ObjectMenuCreator().setObject(new Object() {
             void app_dir() {
                 openExplorable(getContext().getFilesDir().getParentFile().getAbsolutePath());
             }
@@ -216,9 +220,10 @@ public class ExplorerFragment extends MenuFragment implements AdapterView.OnItem
             }
             int splitIndex = name.indexOf(ExClass.SPLIT_LF);
             CharSequence text;
-            if (splitIndex != -1) {// 缩小回车符之后的文本
+            if (splitIndex != -1) {// 回车之后的文本为summary, 要设置不一样的样式
                 SpannableString ss = new SpannableString(name);
                 ss.setSpan(new RelativeSizeSpan(0.8f), splitIndex, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ss.setSpan(new ForegroundColorSpan(0xff676767), splitIndex, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 text = ss;
             } else {
                 text = name;

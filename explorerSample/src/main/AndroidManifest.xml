@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.ipcjs.explorersample"
+<manifest xmlns:tools="http://schemas.android.com/tools"
+          package="com.ipcjs.explorersample"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
@@ -19,6 +20,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ExplorerActivity"/>
+        <activity android:name=".AppActivity" android:theme="@android:style/Theme.Holo.Light"
+                  tools:ignore="NewApi"/>
     </application>
 
 </manifest>

@@ -30,7 +30,11 @@ public class MainActivity extends AppCompatActivity {
         });
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.content, ExplorerFragment.newInstance(MainActivity.class.getName(), ExplorerActivity.class.getName()), "explorer")
+                    .add(R.id.content, ExplorerFragment.newInstance(
+                            MainActivity.class,
+                            AppActivity.class,
+                            ExplorerActivity.class
+                    ), "explorer")
                     .commit();
         }
     }

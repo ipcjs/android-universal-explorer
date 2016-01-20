@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.ipcjs.explorer.ExUtils.error;
+import static com.ipcjs.explorer.ExUtils.info;
 
 /**
  * Created by JiangSong on 2015/12/2.
@@ -72,10 +73,10 @@ public class ExClass implements Explorer.Explorable {
                 // public static void main(String... args);
                 Method mainMethod = cls.getMethod("main", new String[]{}.getClass());
                 mainMethod.invoke(null, new Object[]{new String[]{}});// 这样才能和args对应...
-                error("执行main(), " + cls.getSimpleName());
+                info("执行main(), " + cls.getSimpleName());
             }
         } catch (Exception e) {
-            error(e, e.toString());
+            error(e);
         }
     }
 
@@ -151,25 +152,34 @@ public class ExClass implements Explorer.Explorable {
         return mPackage;
     }
 
+    /**
+     * 当前, 只用来在{@link ExplorerFragment}的list中显示item的文字,
+     * <br>为了同时体现title,summary的概念, 使用{@link #SPLIT_LF}分隔它们~~
+     * <br>显示时在解析出来, 分别应用不同的样式
+     * @see com.ipcjs.explorer.ExplorerFragment.ExplorerAdapter#onBindViewHolder(ExplorerFragment.ExplorerViewHolder, int)
+     */
     @Override
     public String getName() {
+        String[] split = sSplitPattern.split(mPackage);
+        String title = split[split.length - 1];// 返回mPackage的最后一段
+        String summary = null;
+
         if (!isDir()) {// 非目录, 试图读取注解中的title
             try {
                 Class<?> cls = Class.forName(mPackage);
                 Explorer.ExClassName exClassName = cls.getAnnotation(Explorer.ExClassName.class);
                 if (exClassName != null) {
-                    String title = exClassName.value();// 返回注解中的title
-                    String summary = exClassName.summary();
-                    // 使用'\n'拆分title和summary
-                    return title + (TextUtils.isEmpty(summary) ? "" : SPLIT_LF + summary);
+                    if (!TextUtils.isEmpty(exClassName.value())) {
+                        title = exClassName.value();// 返回注解中的title
+                    }
+                    summary = exClassName.summary();// 注解中的summary
                 }
             } catch (ClassNotFoundException e) {
                 // ignore
             }
         }
-
-        String[] split = sSplitPattern.split(mPackage);
-        return split[split.length - 1];// 返回mPackage的最后一段
+        // 使用'\n'拆分title和summary
+        return title + (TextUtils.isEmpty(summary) ? "" : SPLIT_LF + summary);
     }
 
     @Override

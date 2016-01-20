@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 
 import java.lang.reflect.Method;
 
+import static com.ipcjs.explorer.ExUtils.error;
+
 /**
  * Created by ipcjs on 2016/1/19.
  */
@@ -16,7 +18,7 @@ public class FragmentCompat extends Fragment {
         try {
             getContextMethod = Fragment.class.getMethod("getContext");
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            error(e);
         }
         sHasGetContextMethod = getContextMethod != null;
     }

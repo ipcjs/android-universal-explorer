@@ -45,7 +45,7 @@ public class ExFile implements Explorer.Explorable {
 
                 @Override
                 protected void onPreExecute() {
-                    ExUtils.error(String.format("复制文件%s到%s", inFile.getName(), outFile.getPath()));
+                    ExUtils.info(String.format("复制文件%s到%s", inFile.getName(), outFile.getPath()));
                 }
 
                 @Override
@@ -60,7 +60,7 @@ public class ExFile implements Explorer.Explorable {
 
                 @Override
                 protected void onPostExecute(String result) {
-                    ExUtils.error(result);
+                    ExUtils.info(result);
                     if (RESULT_OK.equals(result)) {
                         viewFile(context, outFile);
                     }
@@ -86,7 +86,7 @@ public class ExFile implements Explorer.Explorable {
         try {
             context.startActivity(intent.setDataAndType(data, type));
         } catch (Exception e) {// 若没找到Activity, 会抛异常~~
-            ExUtils.error(e, getClass().getSimpleName(), e.toString());
+            ExUtils.error(e);
             context.startActivity(intent.setDataAndType(data, "*/*"));
         }
     }
