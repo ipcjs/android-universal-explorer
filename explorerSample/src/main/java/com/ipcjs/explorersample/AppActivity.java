@@ -1,12 +1,16 @@
 package com.ipcjs.explorersample;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
 
 import com.ipcjs.explorer.Explorer;
+import com.ipcjs.explorer.ExplorerFragment;
+import com.ipcjs.explorer.menu.ObjectMenuCreator;
 
 import static com.ipcjs.explorer.ExUtils.p;
 
@@ -14,13 +18,25 @@ import static com.ipcjs.explorer.ExUtils.p;
  * Created by JiangSong on 2016/1/20.
  */
 @Explorer.ExClassName(summary = "Menu的生命周期")
-public class AppActivity extends Activity {
+public class AppActivity extends FragmentActivity {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         p();
         super.onCreate(savedInstanceState);
-        getActionBar();
+        Button btn = new Button(this);
+        setContentView(btn);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final ExplorerFragment fragment = ExplorerFragment.setupExplorer(AppActivity.this, ExplorerActivity.class);
+                fragment.getMultiMenuCreator().add(new ObjectMenuCreator().setObject(new Object() {
+                    void clear() {
+                        fragment.getMultiMenuCreator().getList().clear();
+                    }
+                }, null, ObjectMenuCreator.METHOD_RANGE_DECLARED));
+            }
+        });
     }
 
     @Override

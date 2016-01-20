@@ -1,5 +1,6 @@
 package com.ipcjs.explorer.menu;
 
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,9 +24,9 @@ public class MenuFragment extends FragmentCompat {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        setHasOptionsMenu(mMenuCreator.getItemCount() > 0);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);// 有option Menu
     }
 
     @Override

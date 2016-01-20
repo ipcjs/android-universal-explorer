@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.text.SpannableString;
@@ -33,15 +32,17 @@ import java.util.List;
 public class ExplorerFragment extends MenuFragment implements AdapterView.OnItemClickListener, Explorer.ExplorerContainer {
     public static final String ARG_ALL_CLASS = "all_class";
 
-    public static void setupExplorer(FragmentActivity activity, Class... clss) {
+    public static ExplorerFragment setupExplorer(FragmentActivity activity, Class... clss) {
         FragmentManager fm = activity.getSupportFragmentManager();
         String tag = ExplorerFragment.class.getName();
-        Fragment fragment = fm.findFragmentByTag(tag);
+        ExplorerFragment fragment = (ExplorerFragment) fm.findFragmentByTag(tag);
         if (fragment == null) {
+            fragment = newInstance(clss);
             fm.beginTransaction()
-                    .replace(android.R.id.content, newInstance(clss), tag)
+                    .replace(android.R.id.content, fragment, tag)
                     .commit();
         }
+        return fragment;
     }
 
     public static ExplorerFragment newInstance(Class... clss) {
