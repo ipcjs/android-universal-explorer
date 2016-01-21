@@ -11,10 +11,14 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
         }
     }
 }
@@ -30,7 +34,7 @@ dependencies {
 
 repositories {
 //    mavenLocal()// 使用本地仓库
-    maven{// 使用Github仓库
+    maven {// 使用Github仓库
 //        url "${project.rootDir}/../snapshoot-repository"
         url "https://raw.githubusercontent.com/ipcjs/snapshoot-repository/master"
     }

@@ -15,3 +15,15 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+## Keep
+#-keep interface android.support.annotation.Keep
+#-keepclassmembers @android.support.annotation.Keep class * {*;}
+#-keepclassmembers class * {
+#    @android.support.annotation.Keep *;
+#}
+#
+## MenuItem
+#-keep interface com.ipcjs.explorer.menu.MenuCreator$MenuItem
+#-keepclassmembers class * {
+#    @com.ipcjs.explorer.menu.MenuCreator$MenuItem *;
+#}

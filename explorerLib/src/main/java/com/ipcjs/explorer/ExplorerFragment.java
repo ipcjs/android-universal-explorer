@@ -19,6 +19,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.ipcjs.explorer.menu.MenuCreator;
 import com.ipcjs.explorer.menu.MenuFragment;
 import com.ipcjs.explorer.menu.ObjectMenuCreator;
 
@@ -31,6 +32,7 @@ import java.util.List;
  */
 public class ExplorerFragment extends MenuFragment implements AdapterView.OnItemClickListener, Explorer.ExplorerContainer {
     public static final String ARG_ALL_CLASS = "all_class";
+    private InternalMenuObject mMenuObject;
 
     public static ExplorerFragment setupExplorer(FragmentActivity activity, Class... clss) {
         FragmentManager fm = activity.getSupportFragmentManager();
@@ -85,32 +87,22 @@ public class ExplorerFragment extends MenuFragment implements AdapterView.OnItem
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        getMultiMenuCreator().add(new ObjectMenuCreator().setObject(new Object() {
-            void app_dir() {
-                openExplorable(getContext().getFilesDir().getParentFile().getAbsolutePath());
-            }
-
-            void app_ext_dir() {
-                openExplorable(ExUtils.getDir(getContext(), false, true).getParentFile().getAbsolutePath());
-            }
-
-            void ext_dir() {
-                openExplorable(Environment.getExternalStorageDirectory().getAbsolutePath());
-            }
-
-            void root_dir() {
-                openExplorable("/");
-            }
-
-            void pkg_class() {
-                openExplorable(getContext().getPackageName() + ExClass.SPLIT_DOT);
-            }
-        }, null, ObjectMenuCreator.METHOD_RANGE_DECLARED));
         super.onCreate(savedInstanceState);
         ExUtils.initEnvironment(getContext());
         if (getArguments() != null) {
             mAllClass = getArguments().getStringArrayList(ARG_ALL_CLASS);
         }
+        mMenuObject = new InternalMenuObject();
+        // 调用一次, 预防菜单方法被shrinking~~
+        boolean preventShrinking = false;
+        if (preventShrinking) {
+            mMenuObject.app_dir();
+            mMenuObject.app_ext_dir();
+            mMenuObject.ext_dir();
+            mMenuObject.pkg_class();
+            mMenuObject.root_dir();
+        }
+        getMultiMenuCreator().add(new ObjectMenuCreator(mMenuObject));
     }
 
     @Override
@@ -241,6 +233,33 @@ public class ExplorerFragment extends MenuFragment implements AdapterView.OnItem
             this.itemView = itemView;
             this.itemView.setTag(this);
             tvTitle = (TextView) itemView.findViewById(android.R.id.text1);
+        }
+    }
+
+    private class InternalMenuObject {
+        @MenuCreator.MenuItem
+        void app_dir() {
+            openExplorable(getContext().getFilesDir().getParentFile().getAbsolutePath());
+        }
+
+        @MenuCreator.MenuItem
+        void app_ext_dir() {
+            openExplorable(ExUtils.getDir(getContext(), false, true).getParentFile().getAbsolutePath());
+        }
+
+        @MenuCreator.MenuItem
+        void ext_dir() {
+            openExplorable(Environment.getExternalStorageDirectory().getAbsolutePath());
+        }
+
+        @MenuCreator.MenuItem
+        void root_dir() {
+            openExplorable("/");
+        }
+
+        @MenuCreator.MenuItem
+        void pkg_class() {
+            openExplorable(getContext().getPackageName() + ExClass.SPLIT_DOT);
         }
     }
 }

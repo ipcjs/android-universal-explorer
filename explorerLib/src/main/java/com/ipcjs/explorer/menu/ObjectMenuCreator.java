@@ -18,6 +18,14 @@ import static com.ipcjs.explorer.ExUtils.info;
 import static com.ipcjs.explorer.ExUtils.p;
 
 /**
+ * 因为用作生成菜单的方法基本上都不会在代码里直接调用, 故很容易被ProGuard移除掉...
+ * <br>推荐, 添加下面的混淆配置, 防止方法被移除
+ * <code>
+ * -keep interface com.ipcjs.explorer.menu.MenuCreator$MenuItem
+ * -keepclassmembers class * {
+ * @com.ipcjs.explorer.menu.MenuCreator$MenuItem *;
+ * }
+ * </code>
  * Created by JiangSong on 2016/1/19.
  */
 public class ObjectMenuCreator implements MenuCreator {
