@@ -25,6 +25,7 @@ repositories {
 ```
 
 ### ProGurad配置
+防止用于生成菜单的方法被shinking~~
 ```progurad
 # MenuItem
 -keep interface com.ipcjs.explorer.menu.MenuCreator$MenuItem
