@@ -7,7 +7,7 @@ import android.view.View;
 
 import java.lang.reflect.Method;
 
-import static com.ipcjs.explorer.ExUtils.error;
+import static com.ipcjs.explorer.ExUtils.tError;
 
 /**
  * Created by ipcjs on 2016/1/19.
