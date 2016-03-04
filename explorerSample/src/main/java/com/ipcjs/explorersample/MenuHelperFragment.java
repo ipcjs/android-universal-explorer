@@ -12,7 +12,7 @@ import com.ipcjs.explorer.menu.MenuCreator;
 import com.ipcjs.explorer.menu.MenuFragment;
 import com.ipcjs.explorer.menu.ObjectMenuCreator;
 
-import static com.ipcjs.explorer.ExUtils.info;
+import static com.ipcjs.explorer.ExUtils.tInfo;
 
 /**
  * Created by JiangSong on 2016/1/19.
@@ -27,7 +27,7 @@ public class MenuHelperFragment extends MenuFragment {
 
     @MenuCreator.MenuItem
     private int todo() {
-        info("todo");
+        tInfo("todo");
         return 0;
     }
 

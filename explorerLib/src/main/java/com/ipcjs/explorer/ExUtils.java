@@ -4,32 +4,50 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.os.Process;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Created by JiangSong on 2015/12/3.
  */
 public class ExUtils {
     public static final String TAG = "explorer";
+    public static final int STE_CALLER_CALLER_CALLER = 5;
+    public static final int STE_CALLER_CALLER = 4;
+    public static final int STE_CALLER = 3;
+    public static final int STE_CURR = 2;
+    private static final char[] PRIORITY_CHARS = {
+            '0', '1',// 凑数的~~
+            'V', 'D', 'I', 'W', 'E', 'A'// priority的缩写
+    };
     private static Context sApplication;
-    private static final int STE_CALLER = 3;
+    private static Pattern sCallerCallerNamePattern = Pattern.compile("[pw][A-Z].*");
 
     public static Context getApplication() {
         return sApplication;
@@ -41,6 +59,19 @@ public class ExUtils {
     public static void initEnvironment(Context context) {
         sApplication = context.getApplicationContext();
         forceShowOverflowMenu(context);
+    }
+
+    public static void forceShowOverflowMenu(Context context) {
+        try {
+            ViewConfiguration config = ViewConfiguration.get(context);
+            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+            if (menuKeyField != null) {
+                menuKeyField.setAccessible(true);
+                menuKeyField.setBoolean(config, false);
+            }
+        } catch (Exception ex) {
+            // Ignore
+        }
     }
 
     /**
@@ -92,10 +123,65 @@ public class ExUtils {
      * @param objs
      */
     public static void p(Object... objs) {
-        Log.i(TAG, getSTEMethodMsg(Thread.currentThread().getStackTrace()[STE_CALLER]) + ":" + Arrays.deepToString(objs));
+        print(TAG, Log.INFO, false, STE_CALLER_CALLER, objs);
     }
 
-    public static void log(int priority, Throwable e, Object... objs) {
+    /**
+     * 写文件log
+     * @param objs
+     */
+    public static void w(Object... objs) {
+        print(TAG, Log.DEBUG, true, STE_CALLER_CALLER, objs);
+    }
+
+    /**
+     * @param tag      作为log的TAG和打印的文件名, 若为空, 则依据{@link #STE_CALLER_CALLER}的方法名智能提取tag名
+     *                 (例如: tagMethodName = "pTag", 则tag为"Tag")
+     * @param priority log的等级, {@link Log#INFO},{@link Log#ERROR}等
+     * @param toFile   是否输出到文件
+     * @param steIndex 输出内容中类/方法信息使用该方法的哪层调用栈来获取? (eg: {@link #STE_CALLER_CALLER_CALLER})
+     * @param objs     要输出的内容
+     * @return 返回msg, 可以把返回的结果交给其他工具处理
+     */
+    public static String print(String tag, int priority, boolean toFile, int steIndex, Object... objs) {
+        priority = Math.min(Math.max(Log.VERBOSE, priority), Log.ASSERT);
+        StackTraceElement[] steArray = Thread.currentThread().getStackTrace();
+        if (TextUtils.isEmpty(tag)) {// tag为空, 智能提取tag
+            String tagMethodName = steArray[steIndex - 1].getMethodName();// 使用steIndex-1层调用栈的方法名作为tag
+            // 例如: tagMethodName = "pTag", 则tag为"Tag"
+            if (sCallerCallerNamePattern.matcher(tagMethodName).matches()) {// pTag
+                tag = tagMethodName.substring(1);// Tag
+            } else {
+                tag = tagMethodName;
+            }
+        }
+        String msg = String.format("%s: %s", getSTEMethodMsg(steArray[steIndex]), Arrays.deepToString(objs));
+        Log.println(priority, tag, msg);
+        if (toFile && getApplication() != null) {
+            String time = new SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(new Date());
+            char priorityChar = PRIORITY_CHARS[priority];
+            String fileMsg = String.format("%s %s-%s/%s\t%s", time, Process.myPid(), Process.myTid(), priorityChar, msg);
+            str2File(fileMsg, new File(getDir(getApplication(), true, true), tag + ".txt"));
+        }
+        return msg;
+    }
+
+    /** 错误 */
+    public static void tError(Object... objs) {
+        tError(null, objs);
+    }
+
+    /** 错误 */
+    public static void tError(Throwable e, Object... objs) {
+        toast(Log.ERROR, e, objs);
+    }
+
+    /** 信息 */
+    public static void tInfo(Object... objs) {
+        toast(Log.INFO, null, objs);
+    }
+
+    public static void toast(int priority, Throwable e, Object... objs) {
         String msg = Arrays.deepToString(objs);
         if (e != null) {
             msg = e.toString() + ", " + msg;
@@ -105,20 +191,6 @@ public class ExUtils {
         if (getApplication() != null) {
             Toast.makeText(getApplication(), msg, Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public static void error(Throwable e, Object... objs) {
-        log(Log.ERROR, e, objs);
-    }
-
-    /** 信息 */
-    public static void info(Object... objs) {
-        log(Log.INFO, null, objs);
-    }
-
-    /** 错误 */
-    public static void error(Object... objs) {
-        error(null, objs);
     }
 
     /**
@@ -191,16 +263,30 @@ public class ExUtils {
         }
     }
 
-    public static void forceShowOverflowMenu(Context context) {
-        try {
-            ViewConfiguration config = ViewConfiguration.get(context);
-            Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-            if (menuKeyField != null) {
-                menuKeyField.setAccessible(true);
-                menuKeyField.setBoolean(config, false);
+    public static void str2File(String str, File file) {
+        if (!file.getParentFile().exists()) {
+            if (!file.getParentFile().mkdirs()) {
+                return;
             }
-        } catch (Exception ex) {
-            // Ignore
+        }
+        BufferedWriter bw = null;
+        try {
+            OutputStream os = new FileOutputStream(file, true);
+            bw = new BufferedWriter(new OutputStreamWriter(os));
+            bw.write(str);
+            bw.write('\n');
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

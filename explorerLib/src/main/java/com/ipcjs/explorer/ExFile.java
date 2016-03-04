@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.ipcjs.explorer.ExUtils.tError;
+import static com.ipcjs.explorer.ExUtils.tInfo;
+
 /**
  * Created by JiangSong on 2015/12/2.
  */
@@ -33,7 +36,7 @@ public class ExFile implements Explorer.Explorable {
         if (isInternalFile) {
             File dir = new File(ExUtils.getDir(context, true, true), "file_explorer");
             if (!dir.exists() && !dir.mkdirs()) {
-                ExUtils.error("创建目录失败:" + dir);
+                tError("创建目录失败:" + dir);
             }
             final File inFile = mFile;
             final File outFile = new File(dir, ExUtils.getRandomName(4) + "_" + getName());
@@ -45,7 +48,7 @@ public class ExFile implements Explorer.Explorable {
 
                 @Override
                 protected void onPreExecute() {
-                    ExUtils.info(String.format("复制文件%s到%s", inFile.getName(), outFile.getPath()));
+                    tInfo(String.format("复制文件%s到%s", inFile.getName(), outFile.getPath()));
                 }
 
                 @Override
@@ -60,7 +63,7 @@ public class ExFile implements Explorer.Explorable {
 
                 @Override
                 protected void onPostExecute(String result) {
-                    ExUtils.info(result);
+                    tInfo(result);
                     if (RESULT_OK.equals(result)) {
                         viewFile(context, outFile);
                     }
@@ -86,7 +89,7 @@ public class ExFile implements Explorer.Explorable {
         try {
             context.startActivity(intent.setDataAndType(data, type));
         } catch (Exception e) {// 若没找到Activity, 会抛异常~~
-            ExUtils.error(e);
+            tError(e);
             context.startActivity(intent.setDataAndType(data, "*/*"));
         }
     }

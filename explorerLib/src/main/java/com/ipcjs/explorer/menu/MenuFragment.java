@@ -5,13 +5,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.ipcjs.explorer.FragmentCompat;
+import com.ipcjs.explorer.CompatFragment;
 
 /**
  * 支持处理多个{@link ObjectMenuCreator}实例~~
  * Created by JiangSong on 2016/1/19.
  */
-public class MenuFragment extends FragmentCompat {
+public class MenuFragment extends CompatFragment {
     private final ObjectMenuCreator mFragmentMenuCreator = new ObjectMenuCreator(this);
     private MultiMenuCreator mMenuCreator = new MultiMenuCreator(mFragmentMenuCreator);
 
@@ -19,7 +19,7 @@ public class MenuFragment extends FragmentCompat {
         return mMenuCreator;
     }
 
-    protected ObjectMenuCreator getFragmentMenuCreator() {
+    public ObjectMenuCreator getFragmentMenuCreator() {
         return mFragmentMenuCreator;
     }
 

@@ -14,7 +14,7 @@ import java.lang.reflect.Constructor;
 /**
  * Created by JiangSong on 2015/12/10.
  */
-public class ViewWrapperFragment extends FragmentCompat {
+public class ViewWrapperFragment extends CompatFragment {
 
     public static final String ARG_VIEW_CLASS = "viewClass";
 

@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.ipcjs.explorer.ExUtils.tError;
+
 /**
  * Created by JiangSong on 2015/12/2.
  */
@@ -135,13 +137,13 @@ public class ExplorerFragment extends MenuFragment implements AdapterView.OnItem
 
     public void openExplorable(Explorer.Explorable ex) {
         if (ex == null) {
-            ExUtils.error("无访问权限的item");
+            tError("无访问权限的item");
             return;
         }
         if (ex.isDir()) {
             List<Explorer.Explorable> children = ex.getChildren(this);
             if (children == null) {
-                ExUtils.error(String.format("没有访问%s的权限", ex.getPath()));
+                tError(String.format("没有访问%s的权限", ex.getPath()));
                 return;
             }
             mPref.edit().putString(PREF_KEY_CUR_PATH, ex.getPath()).apply();
@@ -163,7 +165,7 @@ public class ExplorerFragment extends MenuFragment implements AdapterView.OnItem
 
         public void setExList(List<Explorer.Explorable> list) {
             if (list == null) {
-                ExUtils.error("list not can null");
+                tError("list not can null");
                 return;
             }
             mExList = list;

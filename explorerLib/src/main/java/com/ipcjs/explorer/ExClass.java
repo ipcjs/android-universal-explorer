@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.ipcjs.explorer.ExUtils.error;
-import static com.ipcjs.explorer.ExUtils.info;
+import static com.ipcjs.explorer.ExUtils.tError;
+import static com.ipcjs.explorer.ExUtils.tInfo;
 
 /**
  * Created by JiangSong on 2015/12/2.
@@ -73,10 +73,10 @@ public class ExClass implements Explorer.Explorable {
                 // public static void main(String... args);
                 Method mainMethod = cls.getMethod("main", new String[]{}.getClass());
                 mainMethod.invoke(null, new Object[]{new String[]{}});// 这样才能和args对应...
-                info("执行main(), " + cls.getSimpleName());
+                tInfo("执行main(), " + cls.getSimpleName());
             }
         } catch (Exception e) {
-            error(e);
+            tError(e);
         }
     }
 
@@ -100,7 +100,7 @@ public class ExClass implements Explorer.Explorable {
                     .addToBackStack(null)
                     .commit();
         } else {
-            error("v4包的fgt, 放到Activity中..., da me");
+            tError("v4包的fgt, 放到Activity中..., da me");
         }
     }
 

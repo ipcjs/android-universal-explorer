@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.ipcjs.explorer.ExUtils.error;
-import static com.ipcjs.explorer.ExUtils.info;
 import static com.ipcjs.explorer.ExUtils.p;
+import static com.ipcjs.explorer.ExUtils.tError;
+import static com.ipcjs.explorer.ExUtils.tInfo;
 
 /**
  * 因为用作生成菜单的方法基本上都不会在代码里直接调用, 故很容易被ProGuard移除掉...
@@ -57,7 +57,7 @@ public class ObjectMenuCreator implements MenuCreator {
 
     public ObjectMenuCreator setObject(Object object) {
         if (object == null) {
-            error("object不能为null");
+            tError("object不能为null");
         } else {
             setObject(object, object.getClass(), METHOD_RANGE_DEFAULT);
         }
@@ -81,7 +81,7 @@ public class ObjectMenuCreator implements MenuCreator {
      */
     public ObjectMenuCreator setObject(Object object, Class cls, int methodRangeFlag) {
         if (object == null && cls == null) {
-            error("object和cls不能同时为null");
+            tError("object和cls不能同时为null");
         } else {
             mObject = object;
             // object为null则使用cls的hasCode
@@ -150,11 +150,11 @@ public class ObjectMenuCreator implements MenuCreator {
             try {
                 Object result = mMethodList.get(item.getItemId()).invoke(mObject);
                 if (result != null) {
-                    info("result", result);
+                    tInfo("result", result);
                 }
                 return true;
             } catch (/*IllegalAccessException | InvocationTarget*/Exception e) {
-                error(e);
+                tError(e, e.getCause());
             }
         }
         return false;
