@@ -14,13 +14,11 @@ Universal Explorer
 ### gradle配置
 ```groovy
 dependencies {
-     compile 'com.github.ipcjs:universal-explorer:0.2.2'
+     compile 'com.github.ipcjs:android-universal-explorer:0.3.1'
 }
 
 repositories {
-    maven{
-        url "https://raw.githubusercontent.com/ipcjs/snapshoot-repository/master"
-    }
+    maven { url "https://jitpack.io" }
 }
 ```
 
