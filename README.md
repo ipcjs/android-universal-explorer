@@ -14,7 +14,7 @@ Universal Explorer
 ### gradle配置
 ```groovy
 dependencies {
-     compile 'com.github.ipcjs:android-universal-explorer:0.3.1'
+     compile 'com.github.ipcjs:android-universal-explorer:1.0.0'
 }
 
 repositories {
@@ -31,5 +31,5 @@ repositories {
     @com.github.ipcjs.explorer.menu.MenuCreator$MenuItem *;
 }
 ```
-
-
+### 从0.*.*版升级到1.*.*版的方式
+全局替换 `com\.ipcjs\.(explorer(sample)?)([;."])` 成 `com\.github\.ipcjs\.$1$3`
