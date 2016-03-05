@@ -31,5 +31,5 @@ repositories {
     @com.github.ipcjs.explorer.menu.MenuCreator$MenuItem *;
 }
 ```
-### 从0.*.*版升级到1.*.*版的方式
+### 从`0.*.*`版升级到`1.*.*`版的方式
 全局替换 `com\.ipcjs\.(explorer(sample)?)([;."])` 成 `com\.github\.ipcjs\.$1$3`
