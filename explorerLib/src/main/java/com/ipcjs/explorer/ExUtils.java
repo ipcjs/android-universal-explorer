@@ -2,7 +2,9 @@ package com.ipcjs.explorer;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Process;
 import android.support.annotation.NonNull;
@@ -31,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -74,16 +77,22 @@ public class ExUtils {
         }
     }
 
-    /**
-     * 提取{@link StackTraceElement}的方法信息
-     * <br>形如:className.methodName(L:lineNumber)
-     * @param ste
-     * @return
-     */
-    private static String getSTEMethodMsg(StackTraceElement ste) {
-        String callerClazzName = ste.getClassName();
-        callerClazzName = callerClazzName.substring(callerClazzName.lastIndexOf(".") + 1);
-        return String.format("%s.%s(L:%d)", callerClazzName, ste.getMethodName(), ste.getLineNumber());
+    public static String intent2Str(Intent intent) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("打印Intent：");
+        sb.append(intent);
+        if (intent != null) {
+//            sb.append("Action: " + intent.getAction());
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                Set<String> keySet = bundle.keySet();
+                for (String key : keySet) {
+                    sb.append(", " + key + ": " + bundle.get(key));
+                }
+            }
+            sb.append(", ").append("Component: " + intent.getComponent());
+        }
+        return sb.toString();
     }
 
     public static <F> String value2Str(Class<?> cls, F value, String prefix) {
@@ -111,6 +120,18 @@ public class ExUtils {
             }
         }
         return result + "(" + value + ")";
+    }
+
+    /**
+     * 提取{@link StackTraceElement}的方法信息
+     * <br>形如:className.methodName(L:lineNumber)
+     * @param ste
+     * @return
+     */
+    private static String getSTEMethodMsg(StackTraceElement ste) {
+        String callerClazzName = ste.getClassName();
+        callerClazzName = callerClazzName.substring(callerClazzName.lastIndexOf(".") + 1);
+        return String.format("%s.%s(L:%d)", callerClazzName, ste.getMethodName(), ste.getLineNumber());
     }
 
     @NonNull
@@ -144,7 +165,6 @@ public class ExUtils {
      * @return 返回msg, 可以把返回的结果交给其他工具处理
      */
     public static String print(String tag, int priority, boolean toFile, int steIndex, Object... objs) {
-        priority = Math.min(Math.max(Log.VERBOSE, priority), Log.ASSERT);
         StackTraceElement[] steArray = Thread.currentThread().getStackTrace();
         if (TextUtils.isEmpty(tag)) {// tag为空, 智能提取tag
             String tagMethodName = steArray[steIndex - 1].getMethodName();// 使用steIndex-1层调用栈的方法名作为tag

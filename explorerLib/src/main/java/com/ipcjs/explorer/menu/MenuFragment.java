@@ -5,7 +5,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.ipcjs.explorer.CompatFragment;
+import com.ipcjs.explorer.compat.CompatFragment;
 
 /**
  * 支持处理多个{@link ObjectMenuCreator}实例~~

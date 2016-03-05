@@ -1,8 +1,10 @@
-package com.ipcjs.explorer;
+package com.ipcjs.explorer.compat;
 
+import android.annotation.TargetApi;
+import android.app.Fragment;
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.IdRes;
-import android.support.v4.app.Fragment;
 import android.view.View;
 
 import java.lang.reflect.Method;
@@ -12,7 +14,8 @@ import static com.ipcjs.explorer.ExUtils.tError;
 /**
  * Created by ipcjs on 2016/1/19.
  */
-public class CompatFragment extends Fragment {
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+public class AppFragment extends Fragment implements CompatContext {
     private static final boolean sHasGetContextMethod;
 
     static {
@@ -34,6 +37,7 @@ public class CompatFragment extends Fragment {
         }
     }
 
+    @Override
     public <V extends View> V $(@IdRes int id) {
         return (V) getView().findViewById(id);
     }
