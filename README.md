@@ -26,9 +26,9 @@ repositories {
 防止用于生成菜单的方法被shinking~~
 ```progurad
 # MenuItem
--keep interface com.ipcjs.explorer.menu.MenuCreator$MenuItem
+-keep interface com.github.ipcjs.explorer.menu.MenuCreator$MenuItem
 -keepclassmembers class * {
-    @com.ipcjs.explorer.menu.MenuCreator$MenuItem *;
+    @com.github.ipcjs.explorer.menu.MenuCreator$MenuItem *;
 }
 ```
 

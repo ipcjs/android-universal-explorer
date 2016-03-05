@@ -23,7 +23,7 @@
 }
 
 # MenuItem
--keep interface com.ipcjs.explorer.menu.MenuCreator$MenuItem
+-keep interface com.github.ipcjs.explorer.menu.MenuCreator$MenuItem
 -keepclassmembers class * {
-    @com.ipcjs.explorer.menu.MenuCreator$MenuItem *;
+    @com.github.ipcjs.explorer.menu.MenuCreator$MenuItem *;
 }
