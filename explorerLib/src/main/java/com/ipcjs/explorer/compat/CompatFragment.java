@@ -12,7 +12,7 @@ import static com.ipcjs.explorer.ExUtils.tError;
 /**
  * Created by ipcjs on 2016/1/19.
  */
-public class CompatFragment extends Fragment implements CompatContext {
+public class CompatFragment extends Fragment implements CompatContextInterface {
     private static final boolean sHasGetContextMethod;
 
     static {

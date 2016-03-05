@@ -7,7 +7,7 @@ import android.view.View;
 /**
  * Created by JiangSong on 2016/3/5.
  */
-public interface CompatContext {
+public interface CompatContextInterface {
     Context getContext();
 
     <V extends View> V $(@IdRes int id);
