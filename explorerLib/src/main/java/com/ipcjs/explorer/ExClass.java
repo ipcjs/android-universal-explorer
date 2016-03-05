@@ -76,7 +76,7 @@ public class ExClass implements Explorer.Explorable {
                 tInfo("执行main(), " + cls.getSimpleName());
             }
         } catch (Exception e) {
-            tError(e);
+            tError(e, e.getCause());
         }
     }
 
