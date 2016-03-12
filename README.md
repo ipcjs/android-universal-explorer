@@ -6,8 +6,10 @@ Universal Explorer
 只是个用来快速写Demo的工具~~
 
 ## ToDo
+- MenuFragment默认实现onClickListener
 
-- [x]当前生成菜单的步骤太麻烦了, 计划使fragment的方法可以生成菜单~~~
+## ok
+- 使用@MenuItem的形式生成菜单
 
 ## 使用
 
