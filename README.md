@@ -1,6 +1,8 @@
 Universal Explorer
 ======
 
+[![Release](https://jitpack.io/v/ipcjs/android-universal-explorer.svg)](https://jitpack.io/#ipcjs/android-universal-explorer)
+
 ## 介绍
 
 只是个用来快速写Demo的工具~~
@@ -16,7 +18,7 @@ Universal Explorer
 ### gradle配置
 ```groovy
 dependencies {
-     compile 'com.github.ipcjs:android-universal-explorer:1.0.0'
+     compile 'com.github.ipcjs:android-universal-explorer:master-SNAPSHOT'
 }
 
 repositories {
