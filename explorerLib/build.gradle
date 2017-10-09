@@ -28,5 +28,6 @@ dependencies {
 //apply from: '../maven_push.gradle'
 apply plugin: 'com.github.dcendents.android-maven'
 
-group = 'com.github.ipcjs:android-universal-explorer'
-version = '1.0.4'
+group = 'com.github.ipcjs'
+version = '1.0.5'
+project.archivesBaseName = 'android-universal-explorer'
