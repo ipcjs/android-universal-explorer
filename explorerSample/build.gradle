@@ -30,7 +30,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:$rootProject.supportVersion"
     compile "com.android.support:design:$rootProject.supportVersion"
     compile project(':explorerLib')
-//    compile 'com.github.ipcjs:universal-explorer:0.0.1'
+//    compile 'com.github.ipcjs:android-universal-explorer:master-SNAPSHOT'
 }
 
 repositories {
