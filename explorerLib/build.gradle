@@ -25,30 +25,8 @@ dependencies {
 //    compile 'com.android.support:appcompat-v7:23.2.0'
 }
 
-apply plugin: 'maven-publish'
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-}
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
+//apply from: '../maven_push.gradle'
+apply plugin: 'com.github.dcendents.android-maven'
 
-publishing {
-    publications {
-        explorer(MavenPublication) {
-            groupId 'com.github.ipcjs'
-            artifactId 'universal-explorer'
-            version '0.2.3'
-            artifact(sourcesJar)// 打包src
-            artifact(javadocJar)// 打包doc
-            artifact("$buildDir/outputs/aar/${project.name}-release.aar")// 打包arr文件
-        }
-    }
-    repositories {
-//        mavenLocal()// 发布到本地maven仓库
-        maven {// 发布到项目目录，推送到Github后，可以直接用Github中仓库的地址当repositorie
-            url "${project.rootDir}/../snapshoot-repository"
-        }
-    }
-}
+group = 'com.github.ipcjs:android-universal-explorer'
+version = '1.0.4'
