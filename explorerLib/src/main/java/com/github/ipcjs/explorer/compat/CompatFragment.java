@@ -6,6 +6,7 @@ import android.view.View;
 import java.lang.reflect.Method;
 
 import androidx.annotation.IdRes;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import static com.github.ipcjs.explorer.ExUtils.tError;
@@ -26,6 +27,7 @@ public class CompatFragment extends Fragment implements CompatContextInterface {
         sHasGetContextMethod = getContextMethod != null;
     }
 
+    @Nullable
     @Override
     public Context getContext() {
         if (sHasGetContextMethod) {

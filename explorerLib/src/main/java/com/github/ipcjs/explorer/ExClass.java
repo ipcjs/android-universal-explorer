@@ -5,9 +5,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.fragment.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import androidx.fragment.app.FragmentActivity;
+
 import static com.github.ipcjs.explorer.ExUtils.tError;
 import static com.github.ipcjs.explorer.ExUtils.tInfo;
 
@@ -23,9 +25,9 @@ import static com.github.ipcjs.explorer.ExUtils.tInfo;
  * Created by JiangSong on 2015/12/2.
  */
 public class ExClass implements Explorer.Explorable {
-    private static final Pattern sSplitPattern = Pattern.compile("\\.");
     public static final char SPLIT_DOT = '.';
     public static final char SPLIT_LF = '\n';
+    private static final Pattern sSplitPattern = Pattern.compile("\\.");
     private String mPackage;
 
     public ExClass(String pkg) {
@@ -66,12 +68,12 @@ public class ExClass implements Explorer.Explorable {
             } else if (androidx.fragment.app.Fragment.class.isAssignableFrom(cls)) {
                 replaceFragment(context, container, cls, cls, null, true);
             } else if (View.class.isAssignableFrom(cls)) {
-                final Bundle args = new Bundle();
-                args.putSerializable(ViewWrapperFragment.ARG_VIEW_CLASS, cls);
-                replaceFragment(context, container, cls, ViewWrapperFragment.class, args, true);
+                replaceFragment(context, container, cls, ViewWrapperFragment.newViewFragment((Class<? extends View>) cls), true);
+            } else if (Drawable.class.isAssignableFrom(cls)) {
+                replaceFragment(context, container, cls, DrawableWrapperFragment.newDrawableFragment((Class<? extends Drawable>) cls), true);
             } else {
                 // public static void main(String... args);
-                Method mainMethod = cls.getMethod("main", new String[]{}.getClass());
+                Method mainMethod = cls.getMethod("main", String[].class);
                 mainMethod.invoke(null, new Object[]{new String[]{}});// 这样才能和args对应...
                 tInfo("执行main(), " + cls.getSimpleName());
             }
@@ -80,9 +82,8 @@ public class ExClass implements Explorer.Explorable {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void replaceFragment(Context context, Explorer.ExplorerContainer container, Class<?> cls,
-                                 Class fragmentClass, Bundle args, boolean isV4) {
+                                 Object fragment, boolean isV4) {
         if (!(context instanceof Activity)) {
             return;
         }
@@ -91,17 +92,29 @@ public class ExClass implements Explorer.Explorable {
         final String tag = cls.getName();
         if (!isV4) {// app包的fgt
             ((Activity) context).getFragmentManager().beginTransaction()
-                    .replace(containerId, Fragment.instantiate(context, fragmentClass.getName(), args), tag)
+                    .replace(containerId, (Fragment) fragment, tag)
                     .addToBackStack(null)
                     .commit();
         } else if (context instanceof FragmentActivity) {// v4包的fgt, 且context为FragmentActivity
             ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
-                    .replace(containerId, androidx.fragment.app.Fragment.instantiate(context, fragmentClass.getName(), args), tag)
+                    .replace(containerId, (androidx.fragment.app.Fragment) fragment, tag)
                     .addToBackStack(null)
                     .commit();
         } else {
             tError("v4包的fgt, 放到Activity中..., da me");
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void replaceFragment(Context context, Explorer.ExplorerContainer container, Class<?> cls,
+                                 Class fragmentClass, Bundle args, boolean isV4) {
+        Object fragment;
+        if (!isV4) {
+            fragment = Fragment.instantiate(context, fragmentClass.getName(), args);
+        } else {
+            fragment = androidx.fragment.app.Fragment.instantiate(context, fragmentClass.getName(), args);
+        }
+        replaceFragment(context, container, cls, fragment, isV4);
     }
 
     @Override

@@ -3,11 +3,12 @@ package com.github.ipcjs.explorersample;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.github.ipcjs.explorer.Explorer;
 import com.github.ipcjs.explorer.ExplorerFragment;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by JiangSong on 2015/12/2.
@@ -21,6 +22,7 @@ public class ExplorerActivity extends AppCompatActivity {
             ExplorerActivity.class,
             AppFragment.class,
             CustomView.class,
+            CustomDrawable.class,
             TestFragment.class,
             MenuHelperFragment.class,
     };

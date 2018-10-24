@@ -18,23 +18,33 @@ import androidx.annotation.Nullable;
  * Created by JiangSong on 2015/12/10.
  */
 public class ViewWrapperFragment extends CompatFragment {
+    protected static final String ARG_VIEW_CLASS = "viewClass";
 
-    public static final String ARG_VIEW_CLASS = "viewClass";
+    public static ViewWrapperFragment newViewFragment(Class<? extends View> viewClass) {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_VIEW_CLASS, viewClass);
+
+        ViewWrapperFragment fragment = new ViewWrapperFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view;
         try {
-            view = createViewFromArgs();
+            return createViewFromArgs();
         } catch (Exception e) {
             e.printStackTrace();
-            final TextView tv = new TextView(getContext());
-            tv.setText(e.toString());
-            tv.setTextColor(Color.RED);
-            view = tv;
+            return createErrorView(e);
         }
-        return view;
+    }
+
+    protected View createErrorView(Throwable e) {
+        final TextView tv = new TextView(getContext());
+        tv.setText(e.toString());
+        tv.setTextColor(Color.RED);
+        return tv;
     }
 
     private View createViewFromArgs() throws Exception {
