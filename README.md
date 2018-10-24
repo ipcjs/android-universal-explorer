@@ -7,17 +7,12 @@ Universal Explorer
 
 只是个用来快速写Demo的工具~~
 
-## ToDo
-
-- [ ] MenuFragment默认实现onClickListener
-- [x] 使用@MenuItem的形式生成菜单
-
 ## 使用
 
 ### gradle配置
 ```groovy
 dependencies {
-     implementation 'com.github.ipcjs:android-universal-explorer:1.0.5'
+     implementation 'com.github.ipcjs:android-universal-explorer:1.1.0'
 }
 
 repositories {
