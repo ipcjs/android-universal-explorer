@@ -3,7 +3,7 @@ package com.github.ipcjs.explorersample;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import androidx.fragment.app.FragmentActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;

@@ -1,7 +1,6 @@
 package com.github.ipcjs.explorer.menu;
 
 import android.content.Context;
-import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
 import android.view.Menu;
 
@@ -12,6 +11,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import androidx.core.view.MenuItemCompat;
 
 import static com.github.ipcjs.explorer.ExUtils.p;
 import static com.github.ipcjs.explorer.ExUtils.tError;

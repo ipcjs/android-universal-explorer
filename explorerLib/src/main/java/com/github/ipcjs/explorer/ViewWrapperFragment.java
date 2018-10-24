@@ -3,7 +3,6 @@ package com.github.ipcjs.explorer;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,8 @@ import android.widget.TextView;
 import com.github.ipcjs.explorer.compat.CompatFragment;
 
 import java.lang.reflect.Constructor;
+
+import androidx.annotation.Nullable;
 
 /**
  * Created by JiangSong on 2015/12/10.

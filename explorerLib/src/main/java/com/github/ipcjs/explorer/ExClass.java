@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import androidx.fragment.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -59,11 +59,11 @@ public class ExClass implements Explorer.Explorable {
                 // 试图移除ExplorerFragment
                 if (container instanceof ExplorerFragment && context instanceof FragmentActivity) {
                     ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
-                            .remove((android.support.v4.app.Fragment) container)
+                            .remove((androidx.fragment.app.Fragment) container)
                             .addToBackStack(null)
                             .commit();
                 }
-            } else if (android.support.v4.app.Fragment.class.isAssignableFrom(cls)) {
+            } else if (androidx.fragment.app.Fragment.class.isAssignableFrom(cls)) {
                 replaceFragment(context, container, cls, cls, null, true);
             } else if (View.class.isAssignableFrom(cls)) {
                 final Bundle args = new Bundle();
@@ -96,7 +96,7 @@ public class ExClass implements Explorer.Explorable {
                     .commit();
         } else if (context instanceof FragmentActivity) {// v4包的fgt, 且context为FragmentActivity
             ((FragmentActivity) context).getSupportFragmentManager().beginTransaction()
-                    .replace(containerId, android.support.v4.app.Fragment.instantiate(context, fragmentClass.getName(), args), tag)
+                    .replace(containerId, androidx.fragment.app.Fragment.instantiate(context, fragmentClass.getName(), args), tag)
                     .addToBackStack(null)
                     .commit();
         } else {

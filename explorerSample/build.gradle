@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVersion
 
 
     defaultConfig {
@@ -25,12 +24,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile "com.android.support:appcompat-v7:$rootProject.supportVersion"
-    compile "com.android.support:design:$rootProject.supportVersion"
-    compile project(':explorerLib')
-//    compile 'com.github.ipcjs:android-universal-explorer:master-SNAPSHOT'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
+    implementation "androidx.appcompat:appcompat:$androidXVersion"
+    implementation "com.google.android.material:material:$androidXVersion"
+    implementation project(':explorerLib')
+//    implementation 'com.github.ipcjs:android-universal-explorer:master-SNAPSHOT'
 }
 
 repositories {

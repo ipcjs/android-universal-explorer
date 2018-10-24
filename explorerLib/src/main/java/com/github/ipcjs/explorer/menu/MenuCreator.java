@@ -1,13 +1,14 @@
 package com.github.ipcjs.explorer.menu;
 
 import android.content.Context;
-import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import androidx.core.view.MenuItemCompat;
 
 /**
  * Created by JiangSong on 2016/1/19.

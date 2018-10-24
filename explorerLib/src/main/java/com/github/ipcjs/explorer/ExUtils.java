@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Process;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ViewConfiguration;
@@ -35,6 +34,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by JiangSong on 2015/12/3.

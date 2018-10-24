@@ -1,7 +1,6 @@
 package com.github.ipcjs.explorersample;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,8 @@ import com.github.ipcjs.explorer.Explorer;
 import com.github.ipcjs.explorer.menu.MenuCreator;
 import com.github.ipcjs.explorer.menu.MenuFragment;
 import com.github.ipcjs.explorer.menu.ObjectMenuCreator;
+
+import androidx.annotation.Nullable;
 
 import static com.github.ipcjs.explorer.ExUtils.tInfo;
 
