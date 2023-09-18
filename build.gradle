@@ -24,7 +24,7 @@ task clean(type: Delete) {
 }
 
 ext {
-    compileSdkVersion = 28
+    compileSdkVersion = 33
     targetSdkVersion = 28
     minSdkVersion = 14
     androidXVersion = '1.0.0'
