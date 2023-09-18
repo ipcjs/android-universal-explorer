@@ -1,9 +1,16 @@
 package com.github.ipcjs.explorer;
 
+import static com.github.ipcjs.explorer.ExUtils.tError;
+import static com.github.ipcjs.explorer.ExUtils.tInfo;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+
+import androidx.core.content.FileProvider;
+
+import com.github.ipcjs.explorer.compat.OpenFileProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,9 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.github.ipcjs.explorer.ExUtils.tError;
-import static com.github.ipcjs.explorer.ExUtils.tInfo;
 
 /**
  * Created by JiangSong on 2015/12/2.
@@ -33,7 +37,10 @@ public class ExFile implements Explorer.Explorable {
     @Override
     public void onAction(final Context context, Explorer.ExplorerContainer container) {
         boolean isInternalFile = getPath().startsWith(context.getFilesDir().getParentFile().getAbsolutePath());
-        if (isInternalFile) {
+        if (isInternalFile
+                // 除files和caches以外的内部文件不能直接打开, 需要复制一份...
+                && !context.getFilesDir().getName().equals(getName())
+                && !context.getCacheDir().getName().equals(getName())) {
             File dir = new File(ExUtils.getDir(context, true, true), "file_explorer");
             if (!dir.exists() && !dir.mkdirs()) {
                 tError("创建目录失败:" + dir);
@@ -65,16 +72,16 @@ public class ExFile implements Explorer.Explorable {
                 protected void onPostExecute(String result) {
                     tInfo(result);
                     if (RESULT_OK.equals(result)) {
-                        viewFile(context, outFile);
+                        viewFile(context, outFile, true);
                     }
                 }
             }.execute();
         } else {
-            viewFile(context, mFile);
+            viewFile(context, mFile, isInternalFile);
         }
     }
 
-    private void viewFile(Context context, File file) {
+    private void viewFile(Context context, File file, boolean useProvider) {
         String type = null;
         int dotIndex = file.getName().indexOf('.');
         if (dotIndex != -1) {
@@ -84,13 +91,19 @@ public class ExFile implements Explorer.Explorable {
             type = "*/*";
         }
 
-        Uri data = Uri.fromFile(file);
         Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri;
+        if (useProvider) {
+            uri = FileProvider.getUriForFile(context, context.getPackageName() + OpenFileProvider.AUTHORITY_SUFFIX, file);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            uri = Uri.fromFile(file);
+        }
         try {
-            context.startActivity(intent.setDataAndType(data, type));
+            context.startActivity(intent.setDataAndType(uri, type));
         } catch (Exception e) {// 若没找到Activity, 会抛异常~~
             tError(e);
-            context.startActivity(intent.setDataAndType(data, "*/*"));
+            context.startActivity(intent.setDataAndType(uri, "*/*"));
         }
     }
 
