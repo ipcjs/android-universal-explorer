@@ -1,18 +1,24 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 android {
+    namespace 'com.github.ipcjs.explorer'
     compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+            withJavadocJar()
         }
     }
 }
@@ -24,9 +30,16 @@ dependencies {
 //    implementation 'com.android.support:appcompat-v7:23.2.0'
 }
 
-//apply from: '../maven_push.gradle'
-apply plugin: 'com.github.dcendents.android-maven'
-
 group = 'com.github.ipcjs'
 version = '1.1.0'
-project.archivesBaseName = 'android-universal-explorer'
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication){
+                from components.release
+                artifactId 'android-universal-explorer'
+            }
+        }
+    }
+}
