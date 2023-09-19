@@ -37,10 +37,12 @@ public class ExFile implements Explorer.Explorable {
     @Override
     public void onAction(final Context context, Explorer.ExplorerContainer container) {
         boolean isInternalFile = getPath().startsWith(context.getFilesDir().getParentFile().getAbsolutePath());
+        boolean isInFilesDir = getPath().startsWith(context.getFilesDir().getAbsolutePath());
+        boolean isInCacheDir = getPath().startsWith(context.getCacheDir().getAbsolutePath());
         if (isInternalFile
                 // 除files和caches以外的内部文件不能直接打开, 需要复制一份...
-                && !context.getFilesDir().getName().equals(getName())
-                && !context.getCacheDir().getName().equals(getName())) {
+                && !isInFilesDir
+                && !isInCacheDir) {
             File dir = new File(ExUtils.getDir(context, true, true), "file_explorer");
             if (!dir.exists() && !dir.mkdirs()) {
                 tError("创建目录失败:" + dir);

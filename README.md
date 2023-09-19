@@ -12,7 +12,7 @@ Universal Explorer
 ### gradle配置
 ```groovy
 dependencies {
-     implementation 'com.github.ipcjs:android-universal-explorer:1.1.2'
+     implementation 'com.github.ipcjs:android-universal-explorer:1.1.3'
 }
 
 repositories {
