@@ -1,1 +1,8 @@
-include ':explorerLib', ':explorerSample'
+include ':explorerLib'
+
+if (!System.getenv('JITPACK')?.toBoolean()) {
+    include ':explorerSample'
+}
+
+
+
