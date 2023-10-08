@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 
 import androidx.core.content.FileProvider;
 
@@ -34,15 +35,31 @@ public class ExFile implements Explorer.Explorable {
         this(new File(path));
     }
 
+    private boolean isSubDirFor(File... parents) {
+        for (File parent : parents) {
+            if (parent != null && getPath().startsWith(parent.getAbsolutePath())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void onAction(final Context context, Explorer.ExplorerContainer container) {
-        boolean isInternalFile = getPath().startsWith(context.getFilesDir().getParentFile().getAbsolutePath());
-        boolean isInFilesDir = getPath().startsWith(context.getFilesDir().getAbsolutePath());
-        boolean isInCacheDir = getPath().startsWith(context.getCacheDir().getAbsolutePath());
-        if (isInternalFile
-                // 除files和caches以外的内部文件不能直接打开, 需要复制一份...
-                && !isInFilesDir
-                && !isInCacheDir) {
+        boolean isInternalFile = isSubDirFor(
+                context.getFilesDir().getParentFile(),
+                context.getExternalFilesDir(null).getParentFile()
+        );
+        boolean isProvidedDirs = isSubDirFor(
+                context.getFilesDir(),
+                context.getCacheDir(),
+                context.getExternalFilesDir(null),
+                context.getExternalCacheDir()
+        ) || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && isSubDirFor(context.getExternalMediaDirs()));
+
+
+        // 除files和caches以外的内部文件, 没有被provider声明, 不能直接打开, 需要复制一份...
+        if (isInternalFile && !isProvidedDirs) {
             File dir = new File(ExUtils.getDir(context, true, true), "file_explorer");
             if (!dir.exists() && !dir.mkdirs()) {
                 tError("创建目录失败:" + dir);

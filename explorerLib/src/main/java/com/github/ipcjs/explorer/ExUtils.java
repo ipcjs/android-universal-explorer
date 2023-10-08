@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Process;
@@ -11,6 +12,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -34,8 +37,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import androidx.annotation.NonNull;
 
 /**
  * Created by JiangSong on 2015/12/3.
@@ -238,8 +239,9 @@ public class ExUtils {
             e.printStackTrace();
             state = "";
         }
-        int writePermission = context.checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        return Environment.MEDIA_MOUNTED.equals(state) && writePermission == PackageManager.PERMISSION_GRANTED;
+        boolean writePermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
+                || context.checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        return Environment.MEDIA_MOUNTED.equals(state) && writePermission;
     }
 
     public static String getRandomName(int length) {
